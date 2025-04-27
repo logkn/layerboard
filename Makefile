@@ -1,8 +1,8 @@
 # Monorepo Makefile
 
 # Directory names
-FRONTEND_DIR=frontend
-BACKEND_DIR=backend
+FRONTEND_DIR=./frontend
+BACKEND_DIR=./backend
 
 
 CYAN  := \033[36m
@@ -34,7 +34,7 @@ frontend/install:		## Install frontend dependencies
 .PHONY: backend/install
 backend/install: 		## Install backend dependencies
 	@echo "Installing backend dependencies..."
-	cd $(BACKEND_DIR) && uv sync && source .venv/bin/activate.fish
+	cd $(BACKEND_DIR) && source .venv/bin/activate && uv sync
 
 # Run both frontend and backend
 .PHONY: dev
