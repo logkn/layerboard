@@ -52,11 +52,11 @@ frontend/start: 	## Run only frontend
 .PHONY: backend/start
 backend/start: 	## Run only backend
 	@echo "Starting backend..."
-	cd $(BACKEND_DIR) && uv uvicorn main:app --reload
+	cd $(BACKEND_DIR) && uv run uvicorn main:app --reload
 
 # Build frontend for production
-.PHONY: build
-build:		## Build frontend for production
+.PHONY: frontend/build
+frontend/build:		## Build frontend for production
 	cd $(FRONTEND_DIR) && npm run build
 
 # Clean up node_modules and build artifacts
