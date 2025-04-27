@@ -4,48 +4,73 @@
 FRONTEND_DIR=frontend
 BACKEND_DIR=backend
 
-# Default target
+
+CYAN  := \033[36m
+RESET := \033[0m
+
 .PHONY: help
-help:
-	@echo "Available commands:"
-	@echo "  make install         Install dependencies for frontend and backend"
-	@echo "  make dev             Run frontend and backend in development mode"
-	@echo "  make frontend        Start frontend dev server"
-	@echo "  make backend         Start backend dev server"
-	@echo "  make build           Build frontend for production"
-	@echo "  make clean           Clean up generated files"
+help: ## Show this help message.
+	@echo "Usage: make [target]"
+	@echo ""
+	@echo "Available targets:"
+	@grep -E '^[a-zA-Z0-9_/-]+:.*?## ' $(MAKEFILE_LIST) \
+		| sort \
+		| awk 'BEGIN {FS = ":.*?## "}; {printf "  '"$(CYAN)"'%-15s'"$(RESET)"' %s\n", $$1, $$2}'
 
 # Install dependencies
 .PHONY: install
-install:
+install:		## Install dependencies for both frontend and backend
+	@echo "Installing dependencies..."
+	$(MAKE) frontend/install
+	$(MAKE) backend/install
+
+# Install dependencies
+.PHONY: frontend/install
+frontend/install:		## Install frontend dependencies
+	@echo "Installing frontend dependencies..."
 	cd $(FRONTEND_DIR) && npm install
-	cd $(BACKEND_DIR) && poetry install
+
+# Install dependencies
+.PHONY: backend/install
+backend/install: 		## Install backend dependencies
+	@echo "Installing backend dependencies..."
+	cd $(BACKEND_DIR) && uv sync && source .venv/bin/activate.fish
 
 # Run both frontend and backend
 .PHONY: dev
-dev:
-	@echo "Starting backend..."
-	cd $(BACKEND_DIR) && uvicorn main:app --reload &
+dev:		## Run both frontend and backend
+	$(MAKE) backend/start &
+	$(MAKE) frontend/start
+
+# Run only frontend
+.PHONY: frontend/start
+frontend/start: 	## Run only frontend
 	@echo "Starting frontend..."
 	cd $(FRONTEND_DIR) && npm run dev
 
-# Run only frontend
-.PHONY: frontend
-frontend:
-	cd $(FRONTEND_DIR) && npm run dev
-
 # Run only backend
-.PHONY: backend
-backend:
-	cd $(BACKEND_DIR) && uvicorn main:app --reload
+.PHONY: backend/start
+backend/start: 	## Run only backend
+	@echo "Starting backend..."
+	cd $(BACKEND_DIR) && uv uvicorn main:app --reload
 
 # Build frontend for production
 .PHONY: build
-build:
+build:		## Build frontend for production
 	cd $(FRONTEND_DIR) && npm run build
 
 # Clean up node_modules and build artifacts
 .PHONY: clean
-clean:
-	cd $(FRONTEND_DIR) && rm -rf node_modules dist
+clean:		## Clean up node_modules and build artifacts
+	$(MAKE) frontend/clean
+	$(MAKE) backend/clean
+
+# Clean up build artifacts
+.PHONY: backend/clean
+backend/clean: 	## Clean up backend build artifacts
 	cd $(BACKEND_DIR) && rm -rf __pycache__
+
+# Clean up node_modules and build artifacts
+.PHONY: frontend/clean
+frontend/clean: 	## Clean up frontend node_modules and build artifacts
+	cd $(FRONTEND_DIR) && rm -rf node_modules dist
