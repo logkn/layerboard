@@ -24,17 +24,16 @@ install:		## Install dependencies for both frontend and backend
 	$(MAKE) frontend/install
 	$(MAKE) backend/install
 
+.PHONY: backend/install
+backend/install: ## Install backend dependencies
+	@echo "Installing backend dependencies..."
+	cd $(BACKEND_DIR) && uv sync
+
 # Install dependencies
 .PHONY: frontend/install
 frontend/install:		## Install frontend dependencies
 	@echo "Installing frontend dependencies..."
 	cd $(FRONTEND_DIR) && npm install
-
-# Install dependencies
-.PHONY: backend/install
-backend/install: 		## Install backend dependencies
-	@echo "Installing backend dependencies..."
-	cd $(BACKEND_DIR) && source .venv/bin/activate && uv sync
 
 # Run both frontend and backend
 .PHONY: dev
@@ -52,7 +51,7 @@ frontend/start: 	## Run only frontend
 .PHONY: backend/start
 backend/start: 	## Run only backend
 	@echo "Starting backend..."
-	cd $(BACKEND_DIR) && uv run uvicorn main:app --reload
+	cd $(BACKEND_DIR) && source .venv/bin/activate && PYTHONPATH=. uvicorn app.main:app --reload --app-dir .
 
 # Build frontend for production
 .PHONY: frontend/build
