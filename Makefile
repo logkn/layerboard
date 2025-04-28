@@ -33,12 +33,19 @@ backend/install: ## Install backend dependencies
 .PHONY: frontend/install
 frontend/install:		## Install frontend dependencies
 	@echo "Installing frontend dependencies..."
-	cd $(FRONTEND_DIR) && npm i --registry=https://registry.npmjs.org
+	cd $(FRONTEND_DIR) && npm i --registry https://registry.npmjs.org
 
-# Run both frontend and backend
+.PHONY: backend/kill
+backend/kill:	## Kill any running backend processes
+	@echo "Killing backend processes..."
+	pkill -f "uvicorn app.main:app" || true
+
+# Update your dev target to include trap for clean shutdown
 .PHONY: dev
 dev:		## Run both frontend and backend
-	$(MAKE) backend/start &
+	@echo "Starting services. Press Ctrl+C to stop."
+	@trap 'make backend/kill' INT TERM; \
+	$(MAKE) backend/start & \
 	$(MAKE) frontend/start
 
 # Run only frontend
@@ -77,4 +84,4 @@ frontend/clean: 	## Clean up frontend node_modules and build artifacts
 
 .PHONY: backend/lint
 backend/lint: 	## Lint backend code
-	cd $(BACKEND_DIR) && uv run ruff check --fix . && uv run ruff format .
+	cd $(BACKEND_DIR) && uv run ruff check --select I --fix . && uv run ruff format .
