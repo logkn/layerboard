@@ -1,7 +1,3 @@
-from fastapi import APIRouter
-from app.api.v1.endpoints import ping
+from app.api.v1.router import router as router
 
-router = APIRouter()
-
-# Mount v1 routes
-router.include_router(ping.router, prefix="/api/v1", tags=["health"])
+__all__ = ["router"]
