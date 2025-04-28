@@ -73,3 +73,8 @@ backend/clean: 	## Clean up __pycache__ and build artifacts
 .PHONY: frontend/clean
 frontend/clean: 	## Clean up frontend node_modules and build artifacts
 	cd $(FRONTEND_DIR) && rm -rf node_modules dist
+
+
+.PHONY: backend/lint
+backend/lint: 	## Lint backend code
+	cd $(BACKEND_DIR) && uv run ruff check --fix . && uv run ruff format .
