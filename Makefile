@@ -66,9 +66,9 @@ clean:		## Clean up node_modules and build artifacts
 
 # Clean up build artifacts
 .PHONY: backend/clean
-backend/clean: 	## Clean up backend build artifacts
-	cd $(BACKEND_DIR) && rm -rf __pycache__
-
+backend/clean: 	## Clean up __pycache__ and build artifacts
+	cd $(BACKEND_DIR) && find . -type d -name "__pycache__" -exec rm -rf {} +
+	
 # Clean up node_modules and build artifacts
 .PHONY: frontend/clean
 frontend/clean: 	## Clean up frontend node_modules and build artifacts
