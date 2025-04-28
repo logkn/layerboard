@@ -33,7 +33,7 @@ backend/install: ## Install backend dependencies
 .PHONY: frontend/install
 frontend/install:		## Install frontend dependencies
 	@echo "Installing frontend dependencies..."
-	cd $(FRONTEND_DIR) && npm install
+	cd $(FRONTEND_DIR) && npm i --registry=https://registry.npmjs.org
 
 # Run both frontend and backend
 .PHONY: dev
