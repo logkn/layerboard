@@ -68,7 +68,7 @@ frontend/build:		## Build frontend for production
 # Clean up node_modules and build artifacts
 .PHONY: clean
 clean:		## Clean up node_modules and build artifacts
-	$(MAKE) frontend/clean
+	# $(MAKE) frontend/clean
 	$(MAKE) backend/clean
 
 # Clean up build artifacts
@@ -76,10 +76,10 @@ clean:		## Clean up node_modules and build artifacts
 backend/clean: 	## Clean up __pycache__ and build artifacts
 	cd $(BACKEND_DIR) && find . -type d -name "__pycache__" -exec rm -rf {} +
 	
-# Clean up node_modules and build artifacts
-.PHONY: frontend/clean
-frontend/clean: 	## Clean up frontend node_modules and build artifacts
-	cd $(FRONTEND_DIR) && rm -rf node_modules dist
+# # Clean up node_modules and build artifacts
+# .PHONY: frontend/clean
+# frontend/clean: 	## Clean up frontend node_modules and build artifacts
+# 	cd $(FRONTEND_DIR) && rm -rf node_modules dist
 
 
 .PHONY: backend/lint
