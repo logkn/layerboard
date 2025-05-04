@@ -17,6 +17,8 @@ export const Node = ({ id, x, y, label }: Props) => {
   const [isDragging, setIsDragging] = useState(false);
   const width = 120;
   const height = 60;
+  // extra padding around node for hover detection (in pixels)
+  const hitPadding = 8;
   // ref for the Konva Text node to enable inline editing
   const textRef = useRef<any>(null);
   // handle double-click to edit the node label inline
@@ -35,44 +37,52 @@ export const Node = ({ id, x, y, label }: Props) => {
       x: stageBox.left + textPosition.x,
       y: stageBox.top + textPosition.y,
     };
-    // create and style the input element
-    const input = document.createElement("input");
-    document.body.appendChild(input);
-    input.value = textNode.text();
-    input.style.position = "absolute";
-    input.style.top = areaPosition.y + "px";
-    input.style.left = areaPosition.x + "px";
-    input.style.width = width + "px";
-    input.style.fontSize = textNode.fontSize() + "px";
-    input.style.border = "none";
-    input.style.padding = "0px";
-    input.style.margin = "0px";
-    input.style.outline = "none";
-    input.style.textAlign = "center";
-    // match the node height and center text vertically
-    input.style.height = height + "px";
-    input.style.lineHeight = height + "px";
-    input.style.color = textNode.fill();
-    input.focus();
-    input.select();
-    // helper to remove the input and restore text
-    const removeInput = () => {
-      input.remove();
+    // create and style the textarea element for multiline input with wrapping
+    const textarea = document.createElement("textarea");
+    document.body.appendChild(textarea);
+    textarea.value = textNode.text();
+    textarea.setAttribute("wrap", "soft");
+    textarea.style.position = "absolute";
+    textarea.style.top = areaPosition.y + "px";
+    textarea.style.left = areaPosition.x + "px";
+    textarea.style.width = width + "px";
+    textarea.style.height = height + "px";
+    textarea.style.fontSize = textNode.fontSize() + "px";
+    textarea.style.border = "none";
+    textarea.style.padding = "0px";
+    textarea.style.margin = "0px";
+    textarea.style.outline = "none";
+    textarea.style.textAlign = "center";
+    // use a sensible line-height matching the font size to fit multiple lines
+    textarea.style.lineHeight = textNode.fontSize() + "px";
+    textarea.style.color = textNode.fill();
+    textarea.style.resize = "none";
+    textarea.style.overflowY = "auto";
+    textarea.style.overflowX = "hidden";
+    textarea.style.whiteSpace = "pre-wrap";
+    textarea.style.wordWrap = "break-word";
+    textarea.focus();
+    textarea.select();
+    // helper to remove the textarea and restore text
+    const removeTextarea = () => {
+      textarea.remove();
       textNode.show();
       layer.draw();
     };
     // on blur, commit changes
-    input.addEventListener("blur", () => {
-      updateLabel(id, input.value);
-      removeInput();
+    textarea.addEventListener("blur", () => {
+      updateLabel(id, textarea.value);
+      removeTextarea();
     });
     // handle Enter (commit) and Escape (cancel)
-    input.addEventListener("keydown", (ev: any) => {
-      if (ev.key === "Enter") {
-        input.blur();
+    textarea.addEventListener("keydown", (ev: any) => {
+      if (ev.key === "Enter" && !ev.shiftKey) {
+        ev.preventDefault();
+        textarea.blur();
       }
       if (ev.key === "Escape") {
-        removeInput();
+        ev.preventDefault();
+        removeTextarea();
       }
     });
   };
@@ -118,6 +128,16 @@ export const Node = ({ id, x, y, label }: Props) => {
         container.style.cursor = "grab";
       }}
     >
+      {/* invisible hit area for hover beyond node bounds */}
+      <Rect
+        x={-width / 2 - hitPadding}
+        y={-height / 2 - hitPadding}
+        width={width + hitPadding * 2}
+        height={height + hitPadding * 2}
+        fill="black"
+        opacity={0.01}
+      />
+      {/* actual node rectangle */}
       <Rect
         x={-width / 2}
         y={-height / 2}
