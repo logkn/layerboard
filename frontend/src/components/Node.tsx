@@ -49,6 +49,9 @@ export const Node = ({ id, x, y, label }: Props) => {
     input.style.margin = "0px";
     input.style.outline = "none";
     input.style.textAlign = "center";
+    // match the node height and center text vertically
+    input.style.height = height + "px";
+    input.style.lineHeight = height + "px";
     input.style.color = textNode.fill();
     input.focus();
     input.select();
