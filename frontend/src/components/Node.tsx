@@ -14,6 +14,7 @@ export const Node = ({ id, x, y, label }: Props) => {
   const updateLabel = useDiagramStore((s) => s.updateNodeLabel);
   const startConnecting = useDiagramStore((s) => s.startConnecting);
   const [hovered, setHovered] = useState(false);
+  const [isDragging, setIsDragging] = useState(false);
   const width = 120;
   const height = 60;
   // ref for the Konva Text node to enable inline editing
@@ -79,6 +80,8 @@ export const Node = ({ id, x, y, label }: Props) => {
       x={x}
       y={y}
       draggable
+      scaleX={isDragging ? 1.05 : 1}
+      scaleY={isDragging ? 1.05 : 1}
       onMouseEnter={(e) => {
         setHovered(true);
         const container = e.target.getStage().container();
@@ -98,6 +101,7 @@ export const Node = ({ id, x, y, label }: Props) => {
         container.style.cursor = "grab";
       }}
       onDragStart={(e) => {
+        setIsDragging(true);
         const container = e.target.getStage().container();
         container.style.cursor = "grabbing";
       }}
@@ -105,6 +109,7 @@ export const Node = ({ id, x, y, label }: Props) => {
         update(id, e.target.x(), e.target.y());
       }}
       onDragEnd={(e) => {
+        setIsDragging(false);
         update(id, e.target.x(), e.target.y());
         const container = e.target.getStage().container();
         container.style.cursor = "grab";
@@ -122,9 +127,9 @@ export const Node = ({ id, x, y, label }: Props) => {
         stroke="#ffffff"
         strokeWidth={2}
         shadowColor="black"
-        shadowBlur={10}
-        shadowOffset={{ x: 2, y: 2 }}
-        shadowOpacity={0.3}
+        shadowBlur={isDragging ? 20 : 10}
+        shadowOffset={{ x: isDragging ? 4 : 2, y: isDragging ? 4 : 2 }}
+        shadowOpacity={isDragging ? 0.5 : 0.3}
       />
       <Text
         x={-width / 2}
