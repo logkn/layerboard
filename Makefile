@@ -24,6 +24,26 @@ install:		## Install dependencies for both frontend and backend
 	$(MAKE) frontend/install
 	$(MAKE) backend/install
 
+.PHONY: frontend/add
+frontend/add:		## Add a new frontend dependency
+	@echo "Adding frontend dependency..."
+	cd $(FRONTEND_DIR) && npm install -D $(PACKAGE) --registry https://registry.npmjs.org
+
+.PHONY: backend/add
+backend/add:		## Add a new backend dependency
+	@echo "Adding backend dependency..."
+	cd $(BACKEND_DIR) && uv add $(PACKAGE)
+
+.PHONY: frontend/list
+frontend/list:		## List frontend dependencies
+	@echo "Frontend dependencies:"
+	cd $(FRONTEND_DIR) && npm list --depth=0
+
+.PHONY: backend/list
+backend/list:		## List backend dependencies
+	echo "Backend dependencies:"
+	cd $(BACKEND_DIR) && uv list
+
 .PHONY: backend/install
 backend/install: ## Install backend dependencies
 	@echo "Installing backend dependencies..."
@@ -53,6 +73,9 @@ dev:		## Run both frontend and backend
 frontend/start: 	## Run only frontend
 	@echo "Starting frontend..."
 	cd $(FRONTEND_DIR) && npm run dev
+	# open the react app in the default browser
+	xdg-open http://localhost:3000
+	
 
 # Run only backend
 .PHONY: backend/start
