@@ -104,11 +104,16 @@ backend/clean: 	## Clean up __pycache__ and build artifacts
 # frontend/clean: 	## Clean up frontend node_modules and build artifacts
 # 	cd $(FRONTEND_DIR) && rm -rf node_modules dist
 
+.PHONY: lint
+lint:		## Lint both frontend and backend code
+	@echo "Linting code..."
+	$(MAKE) frontend/lint
+	$(MAKE) backend/lint
 
 .PHONY: backend/lint
 backend/lint: 	## Lint backend code
 	cd $(BACKEND_DIR) && uv run ruff check --fix . && uv run ruff format .
 
-# .PHONY: frontend/lint
-# frontend/lint:
-# 	cd $(FRONTEND_DIR) && 
+.PHONY: frontend/lint
+frontend/lint:
+	cd $(FRONTEND_DIR) && npm run format

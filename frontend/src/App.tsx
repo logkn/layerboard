@@ -1,17 +1,15 @@
-import './App.css'
-import { DiagramCanvas } from './features/diagram/DiagramCanvas'
-
-
+import "./App.css";
+import { DiagramCanvas } from "./features/diagram/DiagramCanvas";
 
 function App() {
-    return (
-        <div>
-            <DiagramCanvas />
-        </div>
-    )
+  return (
+    <div>
+      <DiagramCanvas />
+    </div>
+  );
 }
 
-export default App
+export default App;
 
 // function App() {
 //   const [count, setCount] = useState(0)
