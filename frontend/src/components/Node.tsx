@@ -15,8 +15,9 @@ export const Node = ({ id, x, y, label }: Props) => {
   const startConnecting = useDiagramStore((s) => s.startConnecting);
   const [hovered, setHovered] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
-  const width = 120;
-  const height = 60;
+  // increased node dimensions for better visibility
+  const width = 160;
+  const height = 80;
   // extra padding around node for hover detection (in pixels)
   const hitPadding = 8;
   // ref for the Konva Text node to enable inline editing

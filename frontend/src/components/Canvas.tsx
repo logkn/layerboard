@@ -16,8 +16,16 @@ export const Canvas = () => {
       height={window.innerHeight}
       // enable dragging the canvas to pan and show off-screen nodes
       draggable
-      // make canvas borders visible
-      style={{ border: '1px solid rgba(0,0,0,0.2)' }}
+      // subtle grid background that moves with the canvas
+      style={{
+        border: '1px solid rgba(0,0,0,0.2)',
+        // grid cells 25×25px
+        backgroundSize: '25px 25px',
+        backgroundImage: (
+          'linear-gradient(to right, rgba(255,255,255,0.1) 1px, transparent 1px), ' +
+          'linear-gradient(to bottom, rgba(255,255,255,0.1) 1px, transparent 1px)'
+        ),
+      }}
       onMouseMove={(e) => {
         if (!connecting) return;
         const stage = e.target.getStage();
