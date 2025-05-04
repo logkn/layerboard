@@ -39,24 +39,18 @@ export const Canvas = () => {
         {edges.map((edge) => (
           <Edge key={edge.id} {...edge} />
         ))}
-        {connecting &&
-          (() => {
-            const fromNode = nodes.find((n) => n.id === connecting.from);
-            if (!fromNode) return null;
-            return (
-              <Arrow
-                points={[
-                  fromNode.x,
-                  fromNode.y,
-                  connecting.toX,
-                  connecting.toY,
-                ]}
-                stroke="black"
-                fill="black"
-                dash={[4, 4]}
-              />
-            );
-          })()}
+        {connecting && (() => {
+          // draw preview edge from the source handle to the current pointer position
+          const { startX, startY, toX, toY } = connecting;
+          return (
+            <Arrow
+              points={[startX, startY, toX, toY]}
+              stroke="black"
+              fill="black"
+              dash={[4, 4]}
+            />
+          );
+        })()}
         {nodes.map((node) => (
           <Node key={node.id} {...node} />
         ))}
