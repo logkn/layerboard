@@ -39,18 +39,19 @@ export const Canvas = () => {
         {edges.map((edge) => (
           <Edge key={edge.id} {...edge} />
         ))}
-        {connecting && (() => {
-          // draw preview edge from the source handle to the current pointer position
-          const { startX, startY, toX, toY } = connecting;
-          return (
-            <Arrow
-              points={[startX, startY, toX, toY]}
-              stroke="black"
-              fill="black"
-              dash={[4, 4]}
-            />
-          );
-        })()}
+        {connecting &&
+          (() => {
+            // draw preview edge from the source handle to the current pointer position
+            const { startX, startY, toX, toY } = connecting;
+            return (
+              <Arrow
+                points={[startX, startY, toX, toY]}
+                stroke="black"
+                fill="black"
+                dash={[4, 4]}
+              />
+            );
+          })()}
         {nodes.map((node) => (
           <Node key={node.id} {...node} />
         ))}

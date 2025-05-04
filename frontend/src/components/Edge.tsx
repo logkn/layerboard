@@ -34,10 +34,6 @@ export const Edge = ({ id, from, to }: Props) => {
     endY = toNode.y + (dy > 0 ? -NODE_HEIGHT / 2 : NODE_HEIGHT / 2);
   }
   return (
-    <Arrow
-      points={[startX, startY, endX, endY]}
-      stroke="black"
-      fill="black"
-    />
+    <Arrow points={[startX, startY, endX, endY]} stroke="black" fill="black" />
   );
 };
