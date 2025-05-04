@@ -14,6 +14,10 @@ export const Canvas = () => {
     <Stage
       width={window.innerWidth}
       height={window.innerHeight}
+      // enable dragging the canvas to pan and show off-screen nodes
+      draggable
+      // make canvas borders visible
+      style={{ border: '1px solid rgba(0,0,0,0.2)' }}
       onMouseMove={(e) => {
         if (!connecting) return;
         const stage = e.target.getStage();
