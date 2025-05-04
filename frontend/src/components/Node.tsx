@@ -101,6 +101,9 @@ export const Node = ({ id, x, y, label }: Props) => {
         const container = e.target.getStage().container();
         container.style.cursor = "grabbing";
       }}
+      onDragMove={(e) => {
+        update(id, e.target.x(), e.target.y());
+      }}
       onDragEnd={(e) => {
         update(id, e.target.x(), e.target.y());
         const container = e.target.getStage().container();
