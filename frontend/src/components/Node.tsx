@@ -1,5 +1,5 @@
 import { Circle, Text, Group, Rect } from 'react-konva'
-import { useState } from 'react'
+import { useState, useRef } from 'react'
 import { useDiagramStore } from '../store/diagramStore'
 
 type Props = {
@@ -16,6 +16,63 @@ export const Node = ({ id, x, y, label }: Props) => {
     const [hovered, setHovered] = useState(false)
     const width = 120
     const height = 60
+    // ref for the Konva Text node to enable inline editing
+    const textRef = useRef<any>(null)
+    // handle double-click to edit the node label inline
+    const handleTextDblClick = (e: any) => {
+        e.cancelBubble = true
+        const stage = e.target.getStage()
+        const layer = e.target.getLayer()
+        const textNode = textRef.current
+        // hide the Konva text and redraw layer
+        textNode.hide()
+        layer.draw()
+        // calculate position for the HTML input
+        const textPosition = textNode.getAbsolutePosition()
+        const stageBox = stage.container().getBoundingClientRect()
+        const areaPosition = {
+            x: stageBox.left + textPosition.x,
+            y: stageBox.top + textPosition.y,
+        }
+        // create and style the input element
+        const input = document.createElement('input')
+        document.body.appendChild(input)
+        input.value = textNode.text()
+        input.style.position = 'absolute'
+        input.style.top = areaPosition.y + 'px'
+        input.style.left = areaPosition.x + 'px'
+        input.style.width = width + 'px'
+        input.style.fontSize = textNode.fontSize() + 'px'
+        input.style.border = 'none'
+        input.style.padding = '0px'
+        input.style.margin = '0px'
+        input.style.outline = 'none'
+        input.style.textAlign = 'center'
+        input.style.color = textNode.fill()
+        input.focus()
+        input.select()
+        // helper to remove the input and restore text
+        const removeInput = () => {
+            input.remove()
+            textNode.show()
+            layer.draw()
+        }
+        // on blur, commit changes
+        input.addEventListener('blur', () => {
+            updateLabel(id, input.value)
+            removeInput()
+        })
+        // handle Enter (commit) and Escape (cancel)
+        input.addEventListener('keydown', (ev: any) => {
+            if (ev.key === 'Enter') {
+                input.blur()
+            }
+            if (ev.key === 'Escape') {
+                removeInput()
+            }
+        })
+
+    }
 
     return (
         <Group
@@ -77,6 +134,9 @@ export const Node = ({ id, x, y, label }: Props) => {
                 fill="white"
                 align="center"
                 verticalAlign="middle"
+                ref={textRef}
+                onDblClick={handleTextDblClick}
+                onDblTap={handleTextDblClick}
             />
             {hovered && (
                 <>
@@ -167,38 +227,6 @@ export const Node = ({ id, x, y, label }: Props) => {
                     </Group>
                 </>
             )}
-            {/* Edit button */}
-            <Group
-                x={width / 2 - 12}
-                y={-height / 2 + 12}
-                onClick={() => {
-                    const newLabel = window.prompt('Edit label', label)
-                    if (newLabel !== null && newLabel !== label) {
-                        updateLabel(id, newLabel)
-                    }
-                }}
-                onMouseDown={(e) => {
-                    e.cancelBubble = true
-                }}
-            >
-                <Circle
-                    radius={10}
-                    fill="white"
-                    stroke="#4f46e5"
-                    strokeWidth={1}
-                />
-                <Text
-                    text="✎"
-                    fontSize={12}
-                    fill="#4f46e5"
-                    width={20}
-                    height={20}
-                    align="center"
-                    verticalAlign="middle"
-                    offsetX={10}
-                    offsetY={10}
-                />
-            </Group>
         </Group>
     )
 }
