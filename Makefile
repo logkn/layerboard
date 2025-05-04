@@ -107,4 +107,8 @@ backend/clean: 	## Clean up __pycache__ and build artifacts
 
 .PHONY: backend/lint
 backend/lint: 	## Lint backend code
-	cd $(BACKEND_DIR) && uv run ruff check --select I --fix . && uv run ruff format .
+	cd $(BACKEND_DIR) && uv run ruff check --fix . && uv run ruff format .
+
+# .PHONY: frontend/lint
+# frontend/lint:
+# 	cd $(FRONTEND_DIR) && 
