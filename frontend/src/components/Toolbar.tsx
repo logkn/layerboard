@@ -19,12 +19,14 @@ export const Toolbar: React.FC = () => {
     console.log("Add Edge mode not implemented");
   };
 
+  const zoomIn = useDiagramStore((s) => s.zoomIn);
   const handleZoomIn = () => {
-    console.log("Zoom In not implemented");
+    zoomIn();
   };
 
+  const zoomOut = useDiagramStore((s) => s.zoomOut);
   const handleZoomOut = () => {
-    console.log("Zoom Out not implemented");
+    zoomOut();
   };
 
   const handleFit = () => {

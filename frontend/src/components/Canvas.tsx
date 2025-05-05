@@ -14,6 +14,8 @@ export const Canvas = () => {
   const updateConnecting = useDiagramStore((s) => s.updateConnecting);
   const finishConnecting = useDiagramStore((s) => s.finishConnecting);
   const collapse = useDiagramStore((s) => s.collapse);
+  // zoom scale from store
+  const scale = useDiagramStore((s) => s.zoom);
   // keyboard shortcut: Esc or Backspace to drill up (collapse to parent graph)
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -57,6 +59,9 @@ export const Canvas = () => {
       height={window.innerHeight}
       // enable dragging the canvas to pan and show off-screen nodes (disabled during marquee)
       draggable={!marqueeStart}
+      // apply zoom scale
+      scaleX={scale}
+      scaleY={scale}
       // background mouse down: start marquee selection or clear selection
       onMouseDown={(e) => {
         if (e.target === e.currentTarget && !connecting) {

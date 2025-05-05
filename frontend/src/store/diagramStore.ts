@@ -58,6 +58,12 @@ interface DiagramState {
   expandNode: (nodeId: string) => void;
   /** Collapse back to the root graph */
   collapse: () => void;
+  /** Current zoom scale for the canvas */
+  zoom: number;
+  /** Zoom in by a fixed multiplier */
+  zoomIn: () => void;
+  /** Zoom out by a fixed multiplier */
+  zoomOut: () => void;
 }
 
 export const useDiagramStore = create<DiagramState>((set, _get) => ({
@@ -255,4 +261,8 @@ export const useDiagramStore = create<DiagramState>((set, _get) => ({
       return { graphs, currentGraphId: nodeId };
     }),
   collapse: () => set(() => ({ currentGraphId: "root", connecting: null })),
+  // zoom state and actions
+  zoom: 1,
+  zoomIn: () => set((state) => ({ zoom: state.zoom * 1.2 })),
+  zoomOut: () => set((state) => ({ zoom: state.zoom / 1.2 })),
 }));
