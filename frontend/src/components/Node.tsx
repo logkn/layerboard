@@ -157,6 +157,15 @@ export const Node = ({ id, x, y, label }: Props) => {
 
   return (
     <Group
+      // enable double-click to drill down into this node's child graph
+      onDblClick={(e) => {
+        e.cancelBubble = true;
+        expandNode(id);
+      }}
+      onDblTap={(e) => {
+        e.cancelBubble = true;
+        expandNode(id);
+      }}
       id={id}
       x={x}
       y={y}
