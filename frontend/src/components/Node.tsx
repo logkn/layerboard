@@ -1,5 +1,6 @@
 import { Circle, Text, Group, Rect } from "react-konva";
 import { useState, useRef, useEffect } from "react";
+import Konva from "konva";
 import { useDiagramStore } from "../store/diagramStore";
 
 type Props = {
@@ -19,6 +20,8 @@ export const Node = ({ id, x, y, label }: Props) => {
   const selectedNodeIds = useDiagramStore((s) => s.selectedNodeIds);
   const isSelected = selectedNodeIds.includes(id);
   const [hovered, setHovered] = useState(false);
+  // ref for the expand chevron icon
+  const chevronRef = useRef<Konva.Text>(null);
   const [isDragging, setIsDragging] = useState(false);
   // context menu state: open flag and position in stage coordinates
   const [contextMenuOpen, setContextMenuOpen] = useState(false);
@@ -154,6 +157,16 @@ export const Node = ({ id, x, y, label }: Props) => {
       stage.off("click", handleStageClick);
     };
   }, [contextMenuOpen, closeContextMenu]);
+  // animate chevron opacity based on hover state
+  useEffect(() => {
+    if (chevronRef.current) {
+      new Konva.Tween({
+        node: chevronRef.current,
+        duration: 0.2,
+        opacity: hovered ? 1 : 0,
+      }).play();
+    }
+  }, [hovered]);
 
   return (
     <Group
@@ -235,8 +248,8 @@ export const Node = ({ id, x, y, label }: Props) => {
         fillLinearGradientEndPoint={{ x: 0, y: height }}
         fillLinearGradientColorStops={[0, "#6366f1", 1, "#4f46e5"]}
         cornerRadius={8}
-        stroke={isSelected ? "#4f46e5" : "#ffffff"}
-        strokeWidth={isSelected ? 3 : 2}
+        stroke={isSelected || hovered ? "#4f46e5" : "#ffffff"}
+        strokeWidth={isSelected || hovered ? 3 : 2}
         shadowColor="black"
         shadowBlur={isDragging ? 20 : 10}
         shadowOffset={{ x: isDragging ? 4 : 2, y: isDragging ? 4 : 2 }}
@@ -258,6 +271,42 @@ export const Node = ({ id, x, y, label }: Props) => {
       />
       {(hovered || isSelected) && (
         <>
+          {/* Tooltip with full node label */}
+          {hovered && (
+            <Group x={-width / 2} y={-height / 2 - 24}>
+              <Rect
+                width={width}
+                height={24}
+                fill="black"
+                cornerRadius={4}
+                opacity={0.75}
+              />
+              <Text
+                text={label}
+                fontSize={12}
+                fill="white"
+                width={width}
+                height={24}
+                align="center"
+                verticalAlign="middle"
+              />
+            </Group>
+          )}
+          {/* Expand chevron (click to drill down) */}
+          <Text
+            ref={chevronRef}
+            text="▶"
+            fontSize={16}
+            fill="white"
+            x={width / 2 - 12}
+            y={-height / 2 + 4}
+            opacity={0}
+            onClick={(e) => {
+              e.cancelBubble = true;
+              expandNode(id);
+            }}
+          />
+          {/* Edge connection handles */}
           {/* Edge handles */}
           {/* Top */}
           <Group
