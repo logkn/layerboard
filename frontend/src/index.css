@@ -3,44 +3,44 @@
 @tailwind utilities;
 
 :root {
-  font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
-  line-height: 1.5;
-  font-weight: 400;
+    font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
+    line-height: 1.5;
+    font-weight: 400;
 
-  color-scheme: dark;
-  
-  font-synthesis: none;
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+    color-scheme: dark;
+
+    font-synthesis: none;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
 }
 
 body {
-  margin: 0;
-  padding: 0;
-  min-width: 320px;
-  min-height: 100vh;
-  /* Replace theme function with direct color values */
-  background-color: #0C0E12; /* Same as theme('colors.background') */
-  color: #E2E4E9; /* Same as theme('colors.text') */
+    margin: 0;
+    padding: 0;
+    min-width: 320px;
+    min-height: 100vh;
+    /* Replace theme function with direct color values */
+    background-color: #0c0e12; /* Same as theme('colors.background') */
+    color: #e2e4e9; /* Same as theme('colors.text') */
 }
 
 #root {
-  width: 100%;
-  height: 100vh;
-  display: flex;
-  flex-direction: column;
+    width: 100%;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
 }
 
 /* Cursor styles for edge creation */
 .cursor-crosshair {
-  cursor: crosshair;
+    cursor: crosshair;
 }
 
 .cursor-grab {
-  cursor: grab;
+    cursor: grab;
 }
 
 .cursor-grabbing {
-  cursor: grabbing;
+    cursor: grabbing;
 }

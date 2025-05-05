@@ -1,48 +1,48 @@
-import React, { useState } from 'react';
-import { Node as NodeType } from '../../types/Node';
-import { useEdgeStore } from '../../store/edgeStore';
-import NodeContextMenu from './NodeContextMenu';
+import React, { useState } from 'react'
+import { Node as NodeType } from '../../types/Node'
+import { useEdgeStore } from '../../store/edgeStore'
+import NodeContextMenu from './NodeContextMenu'
 
 interface NodeProps {
-    node: NodeType;
-    onDragStart: (e: React.MouseEvent) => void;
-    onNodeExpand: () => void;
-    onPortClick: () => void;
+    node: NodeType
+    onDragStart: (e: React.MouseEvent) => void
+    onNodeExpand: () => void
+    onPortClick: () => void
 }
 
 const Node: React.FC<NodeProps> = ({ node, onDragStart, onNodeExpand }) => {
-    const { pendingEdge, startEdgeCreation, finishEdgeCreation } = useEdgeStore();
-    const [contextMenuOpen, setContextMenuOpen] = useState(false);
-    const [contextMenuPosition, setContextMenuPosition] = useState({ x: 0, y: 0 });
+    const { pendingEdge, startEdgeCreation, finishEdgeCreation } = useEdgeStore()
+    const [contextMenuOpen, setContextMenuOpen] = useState(false)
+    const [contextMenuPosition, setContextMenuPosition] = useState({ x: 0, y: 0 })
 
     // Node default styles
-    const defaultColor = '#6E56CF';
+    const defaultColor = '#6E56CF'
 
     const handleDoubleClick = (e: React.MouseEvent) => {
-        e.stopPropagation();
-        onNodeExpand();
-    };
+        e.stopPropagation()
+        onNodeExpand()
+    }
 
     const handlePortMouseDown = (e: React.MouseEvent) => {
-        e.stopPropagation();
-        startEdgeCreation(node.id);
-    };
+        e.stopPropagation()
+        startEdgeCreation(node.id)
+    }
 
     const handlePortMouseUp = (e: React.MouseEvent) => {
-        e.stopPropagation();
+        e.stopPropagation()
 
         if (pendingEdge.pending && pendingEdge.sourceId !== node.id) {
-            finishEdgeCreation(node.id);
+            finishEdgeCreation(node.id)
         }
-    };
+    }
 
     const handleContextMenu = (e: React.MouseEvent) => {
-        e.preventDefault();
-        e.stopPropagation();
+        e.preventDefault()
+        e.stopPropagation()
 
-        setContextMenuPosition({ x: e.clientX, y: e.clientY });
-        setContextMenuOpen(true);
-    };
+        setContextMenuPosition({ x: e.clientX, y: e.clientY })
+        setContextMenuOpen(true)
+    }
 
     return (
         <>
@@ -61,7 +61,7 @@ const Node: React.FC<NodeProps> = ({ node, onDragStart, onNodeExpand }) => {
                     style={{
                         fill: node.style.color || defaultColor,
                         fillOpacity: 0.1,
-                        stroke: (node.style.color || defaultColor)
+                        stroke: node.style.color || defaultColor,
                     }}
                     onMouseDown={onDragStart}
                     onDoubleClick={handleDoubleClick}
@@ -138,7 +138,7 @@ const Node: React.FC<NodeProps> = ({ node, onDragStart, onNodeExpand }) => {
                 />
             )}
         </>
-    );
-};
+    )
+}
 
-export default Node;
+export default Node

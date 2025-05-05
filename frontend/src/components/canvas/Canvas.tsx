@@ -1,43 +1,47 @@
-import React, { useState } from 'react';
-import { useCanvasStore } from '../../store/canvasStore';
-import { useNodeStore } from '../../store/nodeStore';
-import { useEdgeStore } from '../../store/edgeStore';
-import { useCanvasGestures } from '../../hooks/useCanvasGestures';
-import Node from './Node';
-import Edge from './Edge';
-import CanvasControls from './CanvasControls';
-import { NodePosition } from '../../types/Node';
+import React, { useState } from 'react'
+import { useCanvasStore } from '../../store/canvasStore'
+import { useNodeStore } from '../../store/nodeStore'
+import { useEdgeStore } from '../../store/edgeStore'
+import { useCanvasGestures } from '../../hooks/useCanvasGestures'
+import Node from './Node'
+import Edge from './Edge'
+import CanvasControls from './CanvasControls'
+import { NodePosition } from '../../types/Node'
 
 interface CanvasProps {
-    canvasId: string;
+    canvasId: string
 }
 
 const Canvas: React.FC<CanvasProps> = ({ canvasId }) => {
-    const { canvases } = useCanvasStore();
-    const { nodes, moveNode, expandNode } = useNodeStore();
-    const { edges, pendingEdge, cancelEdgeCreation } = useEdgeStore();
-    const [mousePosition, setMousePosition] = useState<NodePosition>({ x: 0, y: 0 });
+    const { canvases } = useCanvasStore()
+    const { nodes, moveNode, expandNode } = useNodeStore()
+    const { edges, pendingEdge, cancelEdgeCreation } = useEdgeStore()
+    const [mousePosition, setMousePosition] = useState<NodePosition>({ x: 0, y: 0 })
 
-    const canvas = canvases[canvasId];
+    const canvas = canvases[canvasId]
 
     if (!canvas) {
-        return <div className="flex items-center justify-center h-full text-text-secondary">Canvas not found</div>;
+        return (
+            <div className="flex items-center justify-center h-full text-text-secondary">
+                Canvas not found
+            </div>
+        )
     }
 
     // Updated node drag handler that accounts for the delta movement
     const handleNodeDrag = (nodeId: string, delta: NodePosition) => {
-        const node = nodes[nodeId];
+        const node = nodes[nodeId]
         if (node) {
             moveNode(nodeId, {
                 x: node.position.x + delta.x,
-                y: node.position.y + delta.y
-            });
+                y: node.position.y + delta.y,
+            })
         }
-    };
+    }
 
     const handleNodeExpand = (nodeId: string) => {
-        expandNode(nodeId);
-    };
+        expandNode(nodeId)
+    }
 
     const {
         isPanning,
@@ -45,28 +49,28 @@ const Canvas: React.FC<CanvasProps> = ({ canvasId }) => {
         handleCanvasMouseMove,
         handleCanvasMouseUp,
         handleCanvasWheel,
-        startNodeDrag
+        startNodeDrag,
     } = useCanvasGestures({
         canvasId,
-        onNodeDrag: handleNodeDrag
-    });
+        onNodeDrag: handleNodeDrag,
+    })
 
     const handleCanvasClick = () => {
         // If we're in edge creation mode, cancel it on canvas click
         if (pendingEdge.pending) {
-            cancelEdgeCreation();
+            cancelEdgeCreation()
         }
-    };
+    }
 
     const handleMouseMove = (e: React.MouseEvent) => {
         // Update mouse position for the pending edge
-        const rect = e.currentTarget.getBoundingClientRect();
-        const x = (e.clientX - rect.left) / canvas.viewport.zoom - canvas.viewport.offset.x;
-        const y = (e.clientY - rect.top) / canvas.viewport.zoom - canvas.viewport.offset.y;
+        const rect = e.currentTarget.getBoundingClientRect()
+        const x = (e.clientX - rect.left) / canvas.viewport.zoom - canvas.viewport.offset.x
+        const y = (e.clientY - rect.top) / canvas.viewport.zoom - canvas.viewport.offset.y
 
-        setMousePosition({ x, y });
-        handleCanvasMouseMove(e);
-    };
+        setMousePosition({ x, y })
+        handleCanvasMouseMove(e)
+    }
 
     return (
         <div className="relative w-full h-full bg-background overflow-hidden">
@@ -83,19 +87,19 @@ const Canvas: React.FC<CanvasProps> = ({ canvasId }) => {
                     className="absolute top-0 left-0 w-full h-full"
                     style={{
                         transform: `translate(${canvas.viewport.offset.x * canvas.viewport.zoom}px, ${canvas.viewport.offset.y * canvas.viewport.zoom}px) scale(${canvas.viewport.zoom})`,
-                        transformOrigin: '0 0'
+                        transformOrigin: '0 0',
                     }}
                 >
                     {/* Draw edges */}
                     {canvas.edges.map((edgeRef) => {
-                        const edge = edges[edgeRef.id];
-                        if (!edge) return null;
+                        const edge = edges[edgeRef.id]
+                        if (!edge) return null
 
                         // Get source and target nodes
-                        const sourceNode = nodes[edge.source];
-                        const targetNode = nodes[edge.target];
+                        const sourceNode = nodes[edge.source]
+                        const targetNode = nodes[edge.target]
 
-                        if (!sourceNode || !targetNode) return null;
+                        if (!sourceNode || !targetNode) return null
 
                         return (
                             <Edge
@@ -104,7 +108,7 @@ const Canvas: React.FC<CanvasProps> = ({ canvasId }) => {
                                 sourceNode={sourceNode}
                                 targetNode={targetNode}
                             />
-                        );
+                        )
                     })}
 
                     {/* Draw pending edge if we're creating one */}
@@ -116,7 +120,7 @@ const Canvas: React.FC<CanvasProps> = ({ canvasId }) => {
                                 source: pendingEdge.sourceId,
                                 target: 'pending',
                                 style: { color: '#6E56CF', strokeWidth: 2 },
-                                bidirectional: false
+                                bidirectional: false,
                             }}
                             sourceNode={nodes[pendingEdge.sourceId]}
                             targetPosition={mousePosition}
@@ -125,8 +129,8 @@ const Canvas: React.FC<CanvasProps> = ({ canvasId }) => {
 
                     {/* Draw nodes */}
                     {canvas.nodes.map((nodeRef) => {
-                        const node = nodes[nodeRef.id];
-                        if (!node) return null;
+                        const node = nodes[nodeRef.id]
+                        if (!node) return null
 
                         return (
                             <Node
@@ -136,14 +140,14 @@ const Canvas: React.FC<CanvasProps> = ({ canvasId }) => {
                                 onNodeExpand={() => handleNodeExpand(node.id)}
                                 onPortClick={() => { }}
                             />
-                        );
+                        )
                     })}
                 </svg>
 
                 <CanvasControls canvasId={canvasId} />
             </div>
         </div>
-    );
-};
+    )
+}
 
-export default Canvas;
+export default Canvas

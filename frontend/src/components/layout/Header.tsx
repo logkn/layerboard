@@ -1,5 +1,5 @@
-import React from 'react';
-import Breadcrumb from './Breadcrumb';
+import React from 'react'
+import Breadcrumb from './Breadcrumb'
 
 const Header: React.FC = () => {
     return (
@@ -13,7 +13,7 @@ const Header: React.FC = () => {
                 {/* Future additions: User menu, settings, etc. */}
             </div>
         </header>
-    );
-};
+    )
+}
 
-export default Header;
+export default Header

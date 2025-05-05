@@ -1,50 +1,50 @@
-import { create } from 'zustand';
-import { nanoid } from 'nanoid';
-import { Edge, EdgeStyle } from '../types/Edge';
-import { useCanvasStore } from './canvasStore';
+import { create } from 'zustand'
+import { nanoid } from 'nanoid'
+import { Edge, EdgeStyle } from '../types/Edge'
+import { useCanvasStore } from './canvasStore'
 
 interface EdgeState {
-    edges: Record<string, Edge>;
+    edges: Record<string, Edge>
     pendingEdge: {
-        sourceId: string | null;
-        pending: boolean;
-    };
+        sourceId: string | null
+        pending: boolean
+    }
 
     // Actions
-    createEdge: (canvasId: string, edge: Omit<Edge, 'id'>) => string;
-    updateEdge: (edgeId: string, updates: Partial<Edge>) => void;
-    deleteEdge: (edgeId: string) => void;
-    styleEdge: (edgeId: string, style: EdgeStyle) => void;
-    startEdgeCreation: (sourceId: string) => void;
-    finishEdgeCreation: (targetId: string) => void;
-    cancelEdgeCreation: () => void;
+    createEdge: (canvasId: string, edge: Omit<Edge, 'id'>) => string
+    updateEdge: (edgeId: string, updates: Partial<Edge>) => void
+    deleteEdge: (edgeId: string) => void
+    styleEdge: (edgeId: string, style: EdgeStyle) => void
+    startEdgeCreation: (sourceId: string) => void
+    finishEdgeCreation: (targetId: string) => void
+    cancelEdgeCreation: () => void
 }
 
 export const useEdgeStore = create<EdgeState>((set, get) => ({
     edges: {},
     pendingEdge: {
         sourceId: null,
-        pending: false
+        pending: false,
     },
 
     createEdge: (canvasId, edge) => {
-        const id = nanoid();
+        const id = nanoid()
 
         set((state) => ({
             edges: {
                 ...state.edges,
                 [id]: {
                     ...edge,
-                    id
-                }
-            }
-        }));
+                    id,
+                },
+            },
+        }))
 
         // Add the edge to the current canvas
-        const canvasStore = useCanvasStore.getState();
-        canvasStore.addEdgeToCanvas(canvasId, { id });
+        const canvasStore = useCanvasStore.getState()
+        canvasStore.addEdgeToCanvas(canvasId, { id })
 
-        return id;
+        return id
     },
 
     updateEdge: (edgeId, updates) => {
@@ -53,23 +53,23 @@ export const useEdgeStore = create<EdgeState>((set, get) => ({
                 ...state.edges,
                 [edgeId]: {
                     ...state.edges[edgeId],
-                    ...updates
-                }
-            }
-        }));
+                    ...updates,
+                },
+            },
+        }))
     },
 
     deleteEdge: (edgeId) => {
         set((state) => {
-            const { [edgeId]: _, ...remainingEdges } = state.edges;
-            return { edges: remainingEdges };
-        });
+            const { [edgeId]: _, ...remainingEdges } = state.edges
+            return { edges: remainingEdges }
+        })
 
         // Remove the edge from all canvases
-        const canvasStore = useCanvasStore.getState();
-        Object.keys(canvasStore.canvases).forEach(canvasId => {
-            canvasStore.removeEdgeFromCanvas(canvasId, edgeId);
-        });
+        const canvasStore = useCanvasStore.getState()
+        Object.keys(canvasStore.canvases).forEach((canvasId) => {
+            canvasStore.removeEdgeFromCanvas(canvasId, edgeId)
+        })
     },
 
     styleEdge: (edgeId, style) => {
@@ -80,27 +80,27 @@ export const useEdgeStore = create<EdgeState>((set, get) => ({
                     ...state.edges[edgeId],
                     style: {
                         ...state.edges[edgeId].style,
-                        ...style
-                    }
-                }
-            }
-        }));
+                        ...style,
+                    },
+                },
+            },
+        }))
     },
 
     startEdgeCreation: (sourceId) => {
         set({
             pendingEdge: {
                 sourceId,
-                pending: true
-            }
-        });
+                pending: true,
+            },
+        })
     },
 
     finishEdgeCreation: (targetId) => {
-        const { pendingEdge } = get();
+        const { pendingEdge } = get()
 
         if (!pendingEdge.pending || !pendingEdge.sourceId) {
-            return;
+            return
         }
 
         // Don't create self-loops
@@ -108,38 +108,38 @@ export const useEdgeStore = create<EdgeState>((set, get) => ({
             set({
                 pendingEdge: {
                     sourceId: null,
-                    pending: false
-                }
-            });
-            return;
+                    pending: false,
+                },
+            })
+            return
         }
 
         // Create the edge
-        const canvasStore = useCanvasStore.getState();
-        const currentCanvasId = canvasStore.currentCanvasId;
+        const canvasStore = useCanvasStore.getState()
+        const currentCanvasId = canvasStore.currentCanvasId
 
         get().createEdge(currentCanvasId, {
             source: pendingEdge.sourceId,
             target: targetId,
             style: {},
-            bidirectional: false
-        });
+            bidirectional: false,
+        })
 
         // Reset pending edge
         set({
             pendingEdge: {
                 sourceId: null,
-                pending: false
-            }
-        });
+                pending: false,
+            },
+        })
     },
 
     cancelEdgeCreation: () => {
         set({
             pendingEdge: {
                 sourceId: null,
-                pending: false
-            }
-        });
-    }
-}));
+                pending: false,
+            },
+        })
+    },
+}))

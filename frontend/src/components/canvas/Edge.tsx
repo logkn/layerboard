@@ -1,13 +1,13 @@
-import React from 'react';
-import { Edge as EdgeType } from '../../types/Edge';
-import { Node as NodeType, NodePosition } from '../../types/Node';
+import React from 'react'
+import { Edge as EdgeType } from '../../types/Edge'
+import { Node as NodeType, NodePosition } from '../../types/Node'
 
 interface EdgeProps {
-    edge: EdgeType;
-    sourceNode: NodeType;
-    targetNode?: NodeType;
-    targetPosition?: NodePosition;
-    isPending?: boolean;
+    edge: EdgeType
+    sourceNode: NodeType
+    targetNode?: NodeType
+    targetPosition?: NodePosition
+    isPending?: boolean
 }
 
 const Edge: React.FC<EdgeProps> = ({
@@ -15,81 +15,77 @@ const Edge: React.FC<EdgeProps> = ({
     sourceNode,
     targetNode,
     targetPosition,
-    isPending = false
+    isPending = false,
 }) => {
-    if (!sourceNode) return null;
+    if (!sourceNode) return null
 
     // Default styles
-    const defaultColor = '#6E56CF';
-    const defaultStrokeWidth = 2;
-    const defaultDashArray = '';
+    const defaultColor = '#6E56CF'
+    const defaultStrokeWidth = 2
+    const defaultDashArray = ''
 
     // Calculate source port position
-    const sourceX = sourceNode.position.x + sourceNode.size.width / 2;
-    const sourceY = sourceNode.position.y + sourceNode.size.height / 2;
+    const sourceX = sourceNode.position.x + sourceNode.size.width / 2
+    const sourceY = sourceNode.position.y + sourceNode.size.height / 2
 
     // Calculate target port position
-    let targetX: number, targetY: number;
+    let targetX: number, targetY: number
 
     if (isPending && targetPosition) {
-        targetX = targetPosition.x;
-        targetY = targetPosition.y;
+        targetX = targetPosition.x
+        targetY = targetPosition.y
     } else if (targetNode) {
-        targetX = targetNode.position.x + targetNode.size.width / 2;
-        targetY = targetNode.position.y + targetNode.size.height / 2;
+        targetX = targetNode.position.x + targetNode.size.width / 2
+        targetY = targetNode.position.y + targetNode.size.height / 2
     } else {
-        return null;
+        return null
     }
 
     // Find intersection points of line with node rectangles for better edge routing
-    const calcIntersection = (
-        node: NodeType,
-        fromX: number,
-        fromY: number
-    ): [number, number] => {
-        const centerX = node.position.x + node.size.width / 2;
-        const centerY = node.position.y + node.size.height / 2;
+    const calcIntersection = (node: NodeType, fromX: number, fromY: number): [number, number] => {
+        const centerX = node.position.x + node.size.width / 2
+        const centerY = node.position.y + node.size.height / 2
 
         // Calculate slopes
-        const dx = fromX - centerX;
-        const dy = fromY - centerY;
+        const dx = fromX - centerX
+        const dy = fromY - centerY
 
         // Normalize direction vector
-        const length = Math.sqrt(dx * dx + dy * dy);
-        const dirX = dx / length;
-        const dirY = dy / length;
+        const length = Math.sqrt(dx * dx + dy * dy)
+        const dirX = dx / length
+        const dirY = dy / length
 
         // Half width and height
-        const halfWidth = node.size.width / 2;
-        const halfHeight = node.size.height / 2;
+        const halfWidth = node.size.width / 2
+        const halfHeight = node.size.height / 2
 
         // Calculate candidate intersection points
-        let tx, ty;
+        let tx, ty
 
         if (Math.abs(dirX) * halfHeight > Math.abs(dirY) * halfWidth) {
             // Intersection with vertical edges
-            tx = halfWidth * Math.sign(dirX);
-            ty = tx * dirY / dirX;
+            tx = halfWidth * Math.sign(dirX)
+            ty = (tx * dirY) / dirX
         } else {
             // Intersection with horizontal edges
-            ty = halfHeight * Math.sign(dirY);
-            tx = ty * dirX / dirY;
+            ty = halfHeight * Math.sign(dirY)
+            tx = (ty * dirX) / dirY
         }
 
-        return [centerX + tx, centerY + ty];
-    };
+        return [centerX + tx, centerY + ty]
+    }
 
-    let sourcePoint: [number, number] = [sourceX, sourceY];
-    let targetPoint: [number, number] = [targetX, targetY];
+    let sourcePoint: [number, number] = [sourceX, sourceY]
+    let targetPoint: [number, number] = [targetX, targetY]
 
     // Only calculate intersections if this isn't a pending edge
     if (!isPending && targetNode) {
-        sourcePoint = calcIntersection(sourceNode, targetX, targetY);
-        targetPoint = calcIntersection(targetNode, sourceX, sourceY);
+        sourcePoint = calcIntersection(sourceNode, targetX, targetY)
+        targetPoint = calcIntersection(targetNode, sourceX, sourceY)
     }
 
     // Arrow marker for directional edges
-    const markerId = `arrow-${edge.id}`;
+    const markerId = `arrow-${edge.id}`
 
     return (
         <>
@@ -104,10 +100,7 @@ const Edge: React.FC<EdgeProps> = ({
                     markerHeight="6"
                     orient="auto-start-reverse"
                 >
-                    <path
-                        d="M 0 0 L 10 5 L 0 10 z"
-                        fill={edge.style.color || defaultColor}
-                    />
+                    <path d="M 0 0 L 10 5 L 0 10 z" fill={edge.style.color || defaultColor} />
                 </marker>
             </defs>
 
@@ -154,7 +147,7 @@ const Edge: React.FC<EdgeProps> = ({
                 </text>
             )}
         </>
-    );
-};
+    )
+}
 
-export default Edge;
+export default Edge

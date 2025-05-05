@@ -1,19 +1,19 @@
-import { NodeReference } from './Node';
-import { EdgeReference } from './Edge';
+import { NodeReference } from './Node'
+import { EdgeReference } from './Edge'
 
 export interface CanvasViewport {
-    zoom: number;
+    zoom: number
     offset: {
-        x: number;
-        y: number;
-    };
+        x: number
+        y: number
+    }
 }
 
 export interface Canvas {
-    id: string;
-    name: string;
-    nodes: NodeReference[];
-    edges: EdgeReference[];
-    parentNodeId?: string | null;
-    viewport: CanvasViewport;
+    id: string
+    name: string
+    nodes: NodeReference[]
+    edges: EdgeReference[]
+    parentNodeId?: string | null
+    viewport: CanvasViewport
 }

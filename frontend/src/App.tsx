@@ -1,13 +1,13 @@
-import React, { useEffect } from 'react';
-import Header from './components/layout/Header';
-import Sidebar from './components/layout/Sidebar';
-import Canvas from './components/canvas/Canvas';
-import { useCanvasStore } from './store/canvasStore';
-import { useNodeStore } from './store/nodeStore';
+import React, { useEffect } from 'react'
+import Header from './components/layout/Header'
+import Sidebar from './components/layout/Sidebar'
+import Canvas from './components/canvas/Canvas'
+import { useCanvasStore } from './store/canvasStore'
+import { useNodeStore } from './store/nodeStore'
 
 const App: React.FC = () => {
-    const { canvases, currentCanvasId } = useCanvasStore();
-    const { createNode } = useNodeStore();
+    const { canvases, currentCanvasId } = useCanvasStore()
+    const { createNode } = useNodeStore()
 
     // Initialize with some sample data on first load
     useEffect(() => {
@@ -19,26 +19,26 @@ const App: React.FC = () => {
                 position: { x: 200, y: 200 },
                 size: { width: 150, height: 80 },
                 style: { color: '#6E56CF' },
-                parentId: null
-            });
+                parentId: null,
+            })
 
             createNode('root', {
                 label: 'Database',
                 position: { x: 500, y: 200 },
                 size: { width: 150, height: 80 },
                 style: { color: '#F76808' },
-                parentId: null
-            });
+                parentId: null,
+            })
 
             createNode('root', {
                 label: 'API',
                 position: { x: 200, y: 400 },
                 size: { width: 150, height: 80 },
                 style: { color: '#599E47' },
-                parentId: null
-            });
+                parentId: null,
+            })
         }
-    }, []);
+    }, [])
 
     return (
         <>
@@ -50,7 +50,7 @@ const App: React.FC = () => {
                 </main>
             </div>
         </>
-    );
-};
+    )
+}
 
-export default App;
+export default App
