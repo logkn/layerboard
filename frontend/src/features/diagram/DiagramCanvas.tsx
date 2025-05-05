@@ -1,9 +1,8 @@
-import { nanoid } from "nanoid";
 import { useDiagramStore } from "../../store/diagramStore";
 import { Canvas } from "../../components/Canvas";
+import { Toolbar } from "../../components/Toolbar";
 
 export const DiagramCanvas = () => {
-  const addNode = useDiagramStore((s) => s.addNode);
   const collapse = useDiagramStore((s) => s.collapse);
   // breadcrumb / context bar: show current graph path
   const currentGraphId = useDiagramStore((s) => s.currentGraphId);
@@ -43,12 +42,8 @@ export const DiagramCanvas = () => {
         )}
         <span>{breadcrumbLabel}</span>
       </div>
-      <button
-        onClick={() => addNode({ id: nanoid(), x: 100, y: 100, label: "Node" })}
-        style={{ position: "absolute", top: 10, left: 10, zIndex: 10 }}
-      >
-        + Node
-      </button>
+      {/* Top toolbar with canvas controls */}
+      <Toolbar />
       <Canvas />
     </>
   );
