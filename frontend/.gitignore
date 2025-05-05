@@ -22,3 +22,8 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# TODO: delete these after codex usage
+ui-target.md
+ui-todos.md
+technical_report.md
