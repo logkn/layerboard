@@ -137,7 +137,7 @@ export const Node = ({ id, x, y, label }: Props) => {
     const stage = textRef.current?.getStage();
     if (!stage) return;
     // handler to close menu on stage click
-    const handleStageClick = (e: any) => {
+    const handleStageClick = () => {
       closeContextMenu();
     };
     // listen for click events on the stage
@@ -349,7 +349,7 @@ export const Node = ({ id, x, y, label }: Props) => {
             <Group
               key={i}
               y={i * 24}
-              onMouseEnter={(e) => {
+            onMouseEnter={() => {
                 setHoveredMenuItem(i);
               }}
               onMouseLeave={() => {

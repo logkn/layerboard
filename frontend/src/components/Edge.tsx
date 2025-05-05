@@ -143,10 +143,10 @@ export const Edge = ({ id, from, to, label }: Props) => {
   }, [contextMenuOpen]);
 
   return (
-    <Group
-      id={id}
-      onMouseEnter={(e) => { setHovered(true); e.target.getStage().container().style.cursor = "pointer"; }}
-      onMouseLeave={(e) => { setHovered(false); e.target.getStage().container().style.cursor = "default"; }}
+      <Group
+        id={id}
+        onMouseEnter={(e) => { setHovered(true); e.target.getStage()!.container().style.cursor = "pointer"; }}
+        onMouseLeave={(e) => { setHovered(false); e.target.getStage()!.container().style.cursor = "default"; }}
       onClick={(e) => { e.cancelBubble = true; setSelectedEdge(id); if (contextMenuOpen) closeContextMenu(); }}
       onContextMenu={handleContextMenu}
     >

@@ -56,7 +56,7 @@ interface DiagramState {
   collapse: () => void;
 }
 
-export const useDiagramStore = create<DiagramState>((set, get) => ({
+export const useDiagramStore = create<DiagramState>((set, _get) => ({
   // initialize root graph container
   graphs: { root: { nodes: [], edges: [] } },
   currentGraphId: 'root',
