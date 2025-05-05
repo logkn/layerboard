@@ -14,11 +14,18 @@ export const Node = ({ id, x, y, label }: Props) => {
   const updateLabel = useDiagramStore((s) => s.updateNodeLabel);
   const startConnecting = useDiagramStore((s) => s.startConnecting);
   const expandNode = useDiagramStore((s) => s.expandNode);
+  const setSelectedEdge = useDiagramStore((s) => s.setSelectedEdge);
+  const setSelectedNodes = useDiagramStore((s) => s.setSelectedNodes);
+  const selectedNodeIds = useDiagramStore((s) => s.selectedNodeIds);
+  const isSelected = selectedNodeIds.includes(id);
   const [hovered, setHovered] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
   // context menu state: open flag and position in stage coordinates
   const [contextMenuOpen, setContextMenuOpen] = useState(false);
-  const [menuPos, setMenuPos] = useState<{ x: number; y: number }>({ x: 0, y: 0 });
+  const [menuPos, setMenuPos] = useState<{ x: number; y: number }>({
+    x: 0,
+    y: 0,
+  });
   // increased node dimensions for better visibility
   const width = 160;
   const height = 80;
@@ -141,10 +148,10 @@ export const Node = ({ id, x, y, label }: Props) => {
       closeContextMenu();
     };
     // listen for click events on the stage
-    stage.on('click', handleStageClick);
+    stage.on("click", handleStageClick);
     // cleanup when menu is closed or component unmounts
     return () => {
-      stage.off('click', handleStageClick);
+      stage.off("click", handleStageClick);
     };
   }, [contextMenuOpen, closeContextMenu]);
 
@@ -156,11 +163,14 @@ export const Node = ({ id, x, y, label }: Props) => {
       draggable
       onContextMenu={handleContextMenu}
       onClick={(e) => {
-        // close context menu on left-click
+        e.cancelBubble = true;
         if (contextMenuOpen) {
-          e.cancelBubble = true;
           closeContextMenu();
+          return;
         }
+        // select this node and clear any selected edge
+        setSelectedEdge(null);
+        setSelectedNodes([id]);
       }}
       scaleX={isDragging ? 1.05 : 1}
       scaleY={isDragging ? 1.05 : 1}
@@ -216,8 +226,8 @@ export const Node = ({ id, x, y, label }: Props) => {
         fillLinearGradientEndPoint={{ x: 0, y: height }}
         fillLinearGradientColorStops={[0, "#6366f1", 1, "#4f46e5"]}
         cornerRadius={8}
-        stroke="#ffffff"
-        strokeWidth={2}
+        stroke={isSelected ? "#4f46e5" : "#ffffff"}
+        strokeWidth={isSelected ? 3 : 2}
         shadowColor="black"
         shadowBlur={isDragging ? 20 : 10}
         shadowOffset={{ x: isDragging ? 4 : 2, y: isDragging ? 4 : 2 }}
@@ -237,7 +247,7 @@ export const Node = ({ id, x, y, label }: Props) => {
         onDblClick={handleTextDblClick}
         onDblTap={handleTextDblClick}
       />
-      {hovered && (
+      {(hovered || isSelected) && (
         <>
           {/* Edge handles */}
           {/* Top */}
@@ -342,14 +352,14 @@ export const Node = ({ id, x, y, label }: Props) => {
             shadowOpacity={0.3}
           />
           {[
-            { label: 'Edit Text', onClick: handleEditTextMenu },
-            { label: 'Expand', onClick: handleExpandMenu },
-            { label: 'Dummy', onClick: handleDummyMenu },
+            { label: "Edit Text", onClick: handleEditTextMenu },
+            { label: "Expand", onClick: handleExpandMenu },
+            { label: "Dummy", onClick: handleDummyMenu },
           ].map((item, i) => (
             <Group
               key={i}
               y={i * 24}
-            onMouseEnter={() => {
+              onMouseEnter={() => {
                 setHoveredMenuItem(i);
               }}
               onMouseLeave={() => {
@@ -363,7 +373,7 @@ export const Node = ({ id, x, y, label }: Props) => {
               <Rect
                 width={120}
                 height={24}
-                fill={hoveredMenuItem === i ? '#e8e8e8' : 'white'}
+                fill={hoveredMenuItem === i ? "#e8e8e8" : "white"}
               />
               <Text
                 text={item.label}

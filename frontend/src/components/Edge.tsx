@@ -34,24 +34,32 @@ export const Edge = ({ id, from, to, label }: Props) => {
   let startX: number, startY: number, endX: number, endY: number;
   if (absDx > absDy) {
     // horizontal connection: attach to left/right node border (including stroke)
-    startX = fromNode.x + (dx > 0
-      ? NODE_WIDTH / 2 + STROKE_OFFSET
-      : -NODE_WIDTH / 2 - STROKE_OFFSET);
+    startX =
+      fromNode.x +
+      (dx > 0
+        ? NODE_WIDTH / 2 + STROKE_OFFSET
+        : -NODE_WIDTH / 2 - STROKE_OFFSET);
     startY = fromNode.y;
-    endX = toNode.x + (dx > 0
-      ? -NODE_WIDTH / 2 - STROKE_OFFSET
-      : NODE_WIDTH / 2 + STROKE_OFFSET);
+    endX =
+      toNode.x +
+      (dx > 0
+        ? -NODE_WIDTH / 2 - STROKE_OFFSET
+        : NODE_WIDTH / 2 + STROKE_OFFSET);
     endY = toNode.y;
   } else {
     // vertical connection: attach to top/bottom node border (including stroke)
     startX = fromNode.x;
-    startY = fromNode.y + (dy > 0
-      ? NODE_HEIGHT / 2 + STROKE_OFFSET
-      : -NODE_HEIGHT / 2 - STROKE_OFFSET);
+    startY =
+      fromNode.y +
+      (dy > 0
+        ? NODE_HEIGHT / 2 + STROKE_OFFSET
+        : -NODE_HEIGHT / 2 - STROKE_OFFSET);
     endX = toNode.x;
-    endY = toNode.y + (dy > 0
-      ? -NODE_HEIGHT / 2 - STROKE_OFFSET
-      : NODE_HEIGHT / 2 + STROKE_OFFSET);
+    endY =
+      toNode.y +
+      (dy > 0
+        ? -NODE_HEIGHT / 2 - STROKE_OFFSET
+        : NODE_HEIGHT / 2 + STROKE_OFFSET);
   }
   // midpoint for label placement
   const midX = (startX + endX) / 2;
@@ -59,7 +67,10 @@ export const Edge = ({ id, from, to, label }: Props) => {
   // local UI state
   const [hovered, setHovered] = useState(false);
   const [contextMenuOpen, setContextMenuOpen] = useState(false);
-  const [menuPos, setMenuPos] = useState<{ x: number; y: number }>({ x: 0, y: 0 });
+  const [menuPos, setMenuPos] = useState<{ x: number; y: number }>({
+    x: 0,
+    y: 0,
+  });
   const [hoveredMenuItem, setHoveredMenuItem] = useState<number | null>(null);
   const textRef = useRef<any>(null);
   const isSelected = selectedEdgeId === id;
@@ -75,7 +86,10 @@ export const Edge = ({ id, from, to, label }: Props) => {
     layer.draw();
     const textPosition = textNode.getAbsolutePosition();
     const stageBox = stage.container().getBoundingClientRect();
-    const areaPosition = { x: stageBox.left + textPosition.x, y: stageBox.top + textPosition.y };
+    const areaPosition = {
+      x: stageBox.left + textPosition.x,
+      y: stageBox.top + textPosition.y,
+    };
     const textarea = document.createElement("textarea");
     document.body.appendChild(textarea);
     textarea.value = textNode.text();
@@ -126,11 +140,27 @@ export const Edge = ({ id, from, to, label }: Props) => {
     }
   };
   const closeContextMenu = () => setContextMenuOpen(false);
-  const handleEditLabelMenu = () => { closeContextMenu(); if (textRef.current) handleTextDblClick({ target: textRef.current, cancelBubble: false }); };
-  const handleDeleteEdgeMenu = () => { closeContextMenu(); deleteEdge(id); };
-  const handleReverseEdgeMenu = () => { closeContextMenu(); reverseEdgeDirection(id); };
-  const handleCopyPropsMenu = () => { closeContextMenu(); copyEdgeProperties(id); };
-  const handlePastePropsMenu = () => { closeContextMenu(); pasteEdgeProperties(id); };
+  const handleEditLabelMenu = () => {
+    closeContextMenu();
+    if (textRef.current)
+      handleTextDblClick({ target: textRef.current, cancelBubble: false });
+  };
+  const handleDeleteEdgeMenu = () => {
+    closeContextMenu();
+    deleteEdge(id);
+  };
+  const handleReverseEdgeMenu = () => {
+    closeContextMenu();
+    reverseEdgeDirection(id);
+  };
+  const handleCopyPropsMenu = () => {
+    closeContextMenu();
+    copyEdgeProperties(id);
+  };
+  const handlePastePropsMenu = () => {
+    closeContextMenu();
+    pasteEdgeProperties(id);
+  };
 
   // close menu on outside click
   useEffect(() => {
@@ -139,15 +169,27 @@ export const Edge = ({ id, from, to, label }: Props) => {
     if (!stage) return;
     const handleStageClick = () => closeContextMenu();
     stage.on("click", handleStageClick);
-    return () => { stage.off("click", handleStageClick); };
+    return () => {
+      stage.off("click", handleStageClick);
+    };
   }, [contextMenuOpen]);
 
   return (
-      <Group
-        id={id}
-        onMouseEnter={(e) => { setHovered(true); e.target.getStage()!.container().style.cursor = "pointer"; }}
-        onMouseLeave={(e) => { setHovered(false); e.target.getStage()!.container().style.cursor = "default"; }}
-      onClick={(e) => { e.cancelBubble = true; setSelectedEdge(id); if (contextMenuOpen) closeContextMenu(); }}
+    <Group
+      id={id}
+      onMouseEnter={(e) => {
+        setHovered(true);
+        e.target.getStage()!.container().style.cursor = "pointer";
+      }}
+      onMouseLeave={(e) => {
+        setHovered(false);
+        e.target.getStage()!.container().style.cursor = "default";
+      }}
+      onClick={(e) => {
+        e.cancelBubble = true;
+        setSelectedEdge(id);
+        if (contextMenuOpen) closeContextMenu();
+      }}
       onContextMenu={handleContextMenu}
     >
       <Arrow
@@ -159,8 +201,22 @@ export const Edge = ({ id, from, to, label }: Props) => {
       {/* control points for rerouting when selected */}
       {isSelected && (
         <>
-          <Circle x={startX} y={startY} radius={6} fill="white" stroke="#4f46e5" strokeWidth={2} />
-          <Circle x={endX} y={endY} radius={6} fill="white" stroke="#4f46e5" strokeWidth={2} />
+          <Circle
+            x={startX}
+            y={startY}
+            radius={6}
+            fill="white"
+            stroke="#4f46e5"
+            strokeWidth={2}
+          />
+          <Circle
+            x={endX}
+            y={endY}
+            radius={6}
+            fill="white"
+            stroke="#4f46e5"
+            strokeWidth={2}
+          />
         </>
       )}
       {/* edge label */}
@@ -202,12 +258,15 @@ export const Edge = ({ id, from, to, label }: Props) => {
               y={i * 24}
               onMouseEnter={() => setHoveredMenuItem(i)}
               onMouseLeave={() => setHoveredMenuItem(null)}
-              onClick={(e) => { e.cancelBubble = true; item.onClick(); }}
+              onClick={(e) => {
+                e.cancelBubble = true;
+                item.onClick();
+              }}
             >
               <Rect
                 width={140}
                 height={24}
-                fill={hoveredMenuItem === i ? '#e8e8e8' : 'white'}
+                fill={hoveredMenuItem === i ? "#e8e8e8" : "white"}
               />
               <Text
                 text={item.label}

@@ -29,6 +29,10 @@ interface DiagramState {
   connecting: Connecting | null;
   /** Currently selected edge ID, or null if none */
   selectedEdgeId: string | null;
+  /** Currently selected node IDs (for multi-selection) */
+  selectedNodeIds: string[];
+  /** Set the selected node IDs */
+  setSelectedNodes: (ids: string[]) => void;
   /** Set the selected edge ID */
   setSelectedEdge: (id: string | null) => void;
   /** Clipboard storage for edge properties */
@@ -59,23 +63,33 @@ interface DiagramState {
 export const useDiagramStore = create<DiagramState>((set, _get) => ({
   // initialize root graph container
   graphs: { root: { nodes: [], edges: [] } },
-  currentGraphId: 'root',
+  currentGraphId: "root",
   connecting: null,
   /** Currently selected edge ID, or null */
   selectedEdgeId: null,
   /** Clipboard storage for edge properties */
   clipboardEdgeProperties: null,
+  /** Currently selected node IDs (for multi-selection) */
+  selectedNodeIds: [],
   /** Select or deselect an edge */
   setSelectedEdge: (id) => set({ selectedEdgeId: id }),
+  /** Set selected node IDs */
+  setSelectedNodes: (ids) => set({ selectedNodeIds: ids }),
   /** Copy properties of an edge to clipboard */
-  copyEdgeProperties: (id) => set((state) => {
+  copyEdgeProperties: (id) =>
+    set((state) => {
       const cg = state.currentGraphId;
       const graph = state.graphs[cg];
       const edge = graph.edges.find((e) => e.id === id);
-      return { clipboardEdgeProperties: edge ? { label: edge.label } : state.clipboardEdgeProperties };
-  }),
+      return {
+        clipboardEdgeProperties: edge
+          ? { label: edge.label }
+          : state.clipboardEdgeProperties,
+      };
+    }),
   /** Paste properties from clipboard to an edge */
-  pasteEdgeProperties: (id) => set((state) => {
+  pasteEdgeProperties: (id) =>
+    set((state) => {
       const clipboard = state.clipboardEdgeProperties;
       if (!clipboard) return {};
       const cg = state.currentGraphId;
@@ -86,12 +100,12 @@ export const useDiagramStore = create<DiagramState>((set, _get) => ({
           [cg]: {
             nodes: graph.nodes,
             edges: graph.edges.map((e) =>
-              e.id === id ? { ...e, label: clipboard.label } : e
+              e.id === id ? { ...e, label: clipboard.label } : e,
             ),
           },
         },
       };
-  }),
+    }),
   addNode: (node) =>
     set((state) => {
       const cg = state.currentGraphId;
@@ -141,9 +155,7 @@ export const useDiagramStore = create<DiagramState>((set, _get) => ({
           ...state.graphs,
           [cg]: {
             nodes: graph.nodes,
-            edges: graph.edges.map((e) =>
-              e.id === id ? { ...e, label } : e
-            ),
+            edges: graph.edges.map((e) => (e.id === id ? { ...e, label } : e)),
           },
         },
       };
@@ -156,10 +168,14 @@ export const useDiagramStore = create<DiagramState>((set, _get) => ({
       return {
         graphs: {
           ...state.graphs,
-          [cg]: { nodes: graph.nodes, edges: graph.edges.filter((e) => e.id !== id) },
+          [cg]: {
+            nodes: graph.nodes,
+            edges: graph.edges.filter((e) => e.id !== id),
+          },
         },
         // clear selection if the deleted edge was selected
-        selectedEdgeId: state.selectedEdgeId === id ? null : state.selectedEdgeId,
+        selectedEdgeId:
+          state.selectedEdgeId === id ? null : state.selectedEdgeId,
       };
     }),
   /** Reverse the direction of an edge */
@@ -173,7 +189,7 @@ export const useDiagramStore = create<DiagramState>((set, _get) => ({
           [cg]: {
             nodes: graph.nodes,
             edges: graph.edges.map((e) =>
-              e.id === id ? { ...e, from: e.to, to: e.from } : e
+              e.id === id ? { ...e, from: e.to, to: e.from } : e,
             ),
           },
         },
@@ -187,7 +203,7 @@ export const useDiagramStore = create<DiagramState>((set, _get) => ({
         id: Math.random().toString(36).substr(2, 9),
         from,
         to,
-        label: '',
+        label: "",
       };
       return {
         graphs: {
@@ -218,7 +234,7 @@ export const useDiagramStore = create<DiagramState>((set, _get) => ({
               id: Math.random().toString(36).substr(2, 9),
               from: conn.from,
               to,
-              label: '',
+              label: "",
             },
           ]
         : graph.edges;
@@ -238,6 +254,5 @@ export const useDiagramStore = create<DiagramState>((set, _get) => ({
       }
       return { graphs, currentGraphId: nodeId };
     }),
-  collapse: () =>
-    set(() => ({ currentGraphId: 'root', connecting: null })),
+  collapse: () => set(() => ({ currentGraphId: "root", connecting: null })),
 }));

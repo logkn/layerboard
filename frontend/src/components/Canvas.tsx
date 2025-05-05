@@ -3,6 +3,7 @@ import { nanoid } from "nanoid";
 import { useDiagramStore } from "../store/diagramStore";
 import { Node } from "./Node";
 import { Edge } from "./Edge";
+import { useState } from "react";
 
 export const Canvas = () => {
   const currentGraphId = useDiagramStore((s) => s.currentGraphId);
@@ -14,6 +15,27 @@ export const Canvas = () => {
   const finishConnecting = useDiagramStore((s) => s.finishConnecting);
   const collapse = useDiagramStore((s) => s.collapse);
   const addNode = useDiagramStore((s) => s.addNode);
+  // action to deselect selected edge when clicking on canvas background
+  const setSelectedEdge = useDiagramStore((s) => s.setSelectedEdge);
+  // action to select nodes (for marquee selection)
+  const setSelectedNodes = useDiagramStore((s) => s.setSelectedNodes);
+  // marquee selection state
+  const [marqueeStart, setMarqueeStart] = useState<{
+    x: number;
+    y: number;
+  } | null>(null);
+  const [marqueeEnd, setMarqueeEnd] = useState<{ x: number; y: number } | null>(
+    null,
+  );
+  // background context menu state
+  const [bgContextMenuOpen, setBgContextMenuOpen] = useState(false);
+  const [bgMenuPos, setBgMenuPos] = useState<{ x: number; y: number }>({
+    x: 0,
+    y: 0,
+  });
+  const [bgHoveredMenuItem, setBgHoveredMenuItem] = useState<number | null>(
+    null,
+  );
   // canvas dimensions and click-to-collapse margin (in px)
   const width = window.innerWidth;
   const height = window.innerHeight;
@@ -23,46 +45,106 @@ export const Canvas = () => {
     <Stage
       width={window.innerWidth}
       height={window.innerHeight}
-      // enable dragging the canvas to pan and show off-screen nodes
-      draggable
+      // enable dragging the canvas to pan and show off-screen nodes (disabled during marquee)
+      draggable={!marqueeStart}
+      // background mouse down: start marquee selection or clear selection
+      onMouseDown={(e) => {
+        if (e.target === e.currentTarget && !connecting) {
+          const stage = e.target.getStage();
+          const pos = stage?.getPointerPosition();
+          if (pos) {
+            setSelectedEdge(null);
+            setSelectedNodes([]);
+            setMarqueeStart(pos);
+            setMarqueeEnd(pos);
+          }
+        }
+      }}
       // subtle grid background that moves with the canvas
       style={{
-        border: '1px solid rgba(0,0,0,0.2)',
+        border: "1px solid rgba(0,0,0,0.2)",
         // grid cells 25×25px
-        backgroundSize: '25px 25px',
-        backgroundImage: (
-          'linear-gradient(to right, rgba(255,255,255,0.1) 1px, transparent 1px), ' +
-          'linear-gradient(to bottom, rgba(255,255,255,0.1) 1px, transparent 1px)'
-        ),
+        backgroundSize: "25px 25px",
+        backgroundImage:
+          "linear-gradient(to right, rgba(255,255,255,0.1) 1px, transparent 1px), " +
+          "linear-gradient(to bottom, rgba(255,255,255,0.1) 1px, transparent 1px)",
       }}
       onMouseMove={(e) => {
-        if (!connecting) return;
         const stage = e.target.getStage();
         const pos = stage?.getPointerPosition();
-        if (pos) updateConnecting(pos.x, pos.y);
+        if (connecting) {
+          if (pos) updateConnecting(pos.x, pos.y);
+        } else if (marqueeStart && pos) {
+          setMarqueeEnd(pos);
+        }
       }}
       onMouseUp={(e) => {
-        if (!connecting) return;
-        let target: any = e.target;
-        let toId: string | undefined;
-        while (target) {
-          const id = target.id && target.id();
-          if (nodes.find((n) => n.id === id)) {
-            toId = id;
-            break;
+        // finish edge connection
+        if (connecting) {
+          let target: any = e.target;
+          let toId: string | undefined;
+          while (target) {
+            const id = target.id && target.id();
+            if (nodes.find((n) => n.id === id)) {
+              toId = id;
+              break;
+            }
+            target = target.getParent && target.getParent();
           }
-          target = target.getParent && target.getParent();
+          finishConnecting(toId);
+          return;
         }
-        finishConnecting(toId);
+        // finish marquee selection
+        if (marqueeStart && marqueeEnd) {
+          const x1 = marqueeStart.x;
+          const y1 = marqueeStart.y;
+          const x2 = marqueeEnd.x;
+          const y2 = marqueeEnd.y;
+          const left = Math.min(x1, x2);
+          const right = Math.max(x1, x2);
+          const top = Math.min(y1, y2);
+          const bottom = Math.max(y1, y2);
+          const selectedIds = nodes
+            .filter(
+              (n) => n.x >= left && n.x <= right && n.y >= top && n.y <= bottom,
+            )
+            .map((n) => n.id);
+          setSelectedNodes(selectedIds);
+          setMarqueeStart(null);
+          setMarqueeEnd(null);
+        }
+      }}
+      // background context menu for canvas
+      onContextMenu={(e) => {
+        e.evt && e.evt.preventDefault();
+        if (e.target === e.currentTarget) {
+          const stage = e.target.getStage();
+          const pos = stage?.getPointerPosition();
+          if (pos) {
+            setBgContextMenuOpen(true);
+            setBgMenuPos({ x: pos.x, y: pos.y });
+          }
+        }
       }}
       onClick={(e) => {
-        if (currentGraphId !== 'root') {
+        // close background context menu
+        if (bgContextMenuOpen) {
+          setBgContextMenuOpen(false);
+        }
+        // Deselect any selected edge when clicking on empty canvas
+        if (e.target === e.currentTarget) {
+          setSelectedEdge(null);
+        }
+        // Collapse to parent graph when clicking near canvas border in child graph
+        if (currentGraphId !== "root") {
           const stage = e.target.getStage();
           const pos = stage?.getPointerPosition();
           if (
             pos &&
-            (pos.x < BORDER_MARGIN || pos.x > width - BORDER_MARGIN ||
-             pos.y < BORDER_MARGIN || pos.y > height - BORDER_MARGIN)
+            (pos.x < BORDER_MARGIN ||
+              pos.x > width - BORDER_MARGIN ||
+              pos.y < BORDER_MARGIN ||
+              pos.y > height - BORDER_MARGIN)
           ) {
             collapse();
           }
@@ -92,32 +174,33 @@ export const Canvas = () => {
     >
       <Layer>
         {/* If in a child graph, render a margin-inside dashed border and centered title */}
-        {currentGraphId !== 'root' && (() => {
-          const parentNode = rootNodes.find((n) => n.id === currentGraphId);
-          if (!parentNode) return null;
-          return (
-            <Group>
-              <Rect
-                x={BORDER_MARGIN}
-                y={BORDER_MARGIN}
-                width={width - BORDER_MARGIN * 2}
-                height={height - BORDER_MARGIN * 2}
-                stroke="#6366f1"
-                strokeWidth={3}
-                dash={[8, 4]}
-              />
-              <Text
-                text={parentNode.label}
-                x={BORDER_MARGIN}
-                y={BORDER_MARGIN + 10}
-                width={width - BORDER_MARGIN * 2}
-                align="center"
-                fontSize={24}
-                fill="black"
-              />
-            </Group>
-          );
-        })()}
+        {currentGraphId !== "root" &&
+          (() => {
+            const parentNode = rootNodes.find((n) => n.id === currentGraphId);
+            if (!parentNode) return null;
+            return (
+              <Group>
+                <Rect
+                  x={BORDER_MARGIN}
+                  y={BORDER_MARGIN}
+                  width={width - BORDER_MARGIN * 2}
+                  height={height - BORDER_MARGIN * 2}
+                  stroke="#6366f1"
+                  strokeWidth={3}
+                  dash={[8, 4]}
+                />
+                <Text
+                  text={parentNode.label}
+                  x={BORDER_MARGIN}
+                  y={BORDER_MARGIN + 10}
+                  width={width - BORDER_MARGIN * 2}
+                  align="center"
+                  fontSize={24}
+                  fill="black"
+                />
+              </Group>
+            );
+          })()}
         {edges.map((edge) => (
           <Edge key={edge.id} {...edge} />
         ))}
@@ -137,6 +220,78 @@ export const Canvas = () => {
         {nodes.map((node) => (
           <Node key={node.id} {...node} />
         ))}
+        {/* marquee selection rectangle */}
+        {marqueeStart && marqueeEnd && (
+          <Rect
+            x={Math.min(marqueeStart.x, marqueeEnd.x)}
+            y={Math.min(marqueeStart.y, marqueeEnd.y)}
+            width={Math.abs(marqueeEnd.x - marqueeStart.x)}
+            height={Math.abs(marqueeEnd.y - marqueeStart.y)}
+            stroke="black"
+            dash={[4, 4]}
+            fill="rgba(0, 0, 255, 0.1)"
+          />
+        )}
+        {/* background context menu */}
+        {bgContextMenuOpen && (
+          <Group x={bgMenuPos.x} y={bgMenuPos.y}>
+            <Rect
+              width={180}
+              height={24 * 5}
+              fill="white"
+              stroke="gray"
+              cornerRadius={4}
+              shadowColor="black"
+              shadowBlur={4}
+              shadowOffset={{ x: 2, y: 2 }}
+              shadowOpacity={0.3}
+            />
+            {[
+              {
+                label: "Add Node Here",
+                action: () => {
+                  addNode({
+                    id: nanoid(),
+                    x: bgMenuPos.x,
+                    y: bgMenuPos.y,
+                    label: "Node",
+                  });
+                },
+              },
+              { label: "Canvas Settings…", action: () => {} },
+              { label: "Paste", action: () => {} },
+              { label: "Zoom to Fit", action: () => {} },
+              { label: "Export Current View", action: () => {} },
+            ].map((item, i) => (
+              <Group
+                key={i}
+                y={i * 24}
+                onMouseEnter={() => setBgHoveredMenuItem(i)}
+                onMouseLeave={() => setBgHoveredMenuItem(null)}
+                onClick={(e) => {
+                  e.cancelBubble = true;
+                  item.action();
+                  setBgContextMenuOpen(false);
+                }}
+              >
+                <Rect
+                  width={180}
+                  height={24}
+                  fill={bgHoveredMenuItem === i ? "#e8e8e8" : "white"}
+                />
+                <Text
+                  text={item.label}
+                  fontSize={14}
+                  fill="black"
+                  padding={4}
+                  width={180}
+                  height={24}
+                  verticalAlign="middle"
+                />
+              </Group>
+            ))}
+          </Group>
+        )}
       </Layer>
     </Stage>
   );
