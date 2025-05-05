@@ -14,7 +14,7 @@ interface CanvasProps {
 
 const Canvas: React.FC<CanvasProps> = ({ canvasId }) => {
     const { canvases } = useCanvasStore();
-    const { nodes, moveNode } = useNodeStore();
+    const { nodes, moveNode, expandNode } = useNodeStore();
     const { edges, pendingEdge, cancelEdgeCreation } = useEdgeStore();
     const [mousePosition, setMousePosition] = useState<NodePosition>({ x: 0, y: 0 });
 
@@ -24,14 +24,19 @@ const Canvas: React.FC<CanvasProps> = ({ canvasId }) => {
         return <div className="flex items-center justify-center h-full text-text-secondary">Canvas not found</div>;
     }
 
-    const handleNodeDrag = (nodeId: string, position: NodePosition) => {
+    // Updated node drag handler that accounts for the delta movement
+    const handleNodeDrag = (nodeId: string, delta: NodePosition) => {
         const node = nodes[nodeId];
         if (node) {
             moveNode(nodeId, {
-                x: node.position.x + position.x,
-                y: node.position.y + position.y
+                x: node.position.x + delta.x,
+                y: node.position.y + delta.y
             });
         }
+    };
+
+    const handleNodeExpand = (nodeId: string) => {
+        expandNode(nodeId);
     };
 
     const {
@@ -128,7 +133,7 @@ const Canvas: React.FC<CanvasProps> = ({ canvasId }) => {
                                 key={node.id}
                                 node={node}
                                 onDragStart={(e) => startNodeDrag(node.id, e)}
-                                onNodeExpand={() => { }}
+                                onNodeExpand={() => handleNodeExpand(node.id)}
                                 onPortClick={() => { }}
                             />
                         );

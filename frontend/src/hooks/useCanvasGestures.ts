@@ -31,8 +31,9 @@ export function useCanvasGestures({
     const [isPanning, setIsPanning] = useState(false);
     const [startPanPoint, setStartPanPoint] = useState({ x: 0, y: 0 });
     const [draggedNodeId, setDraggedNodeId] = useState<string | null>(null);
-    const [dragStartPos, setDragStartPos] = useState({ x: 0, y: 0 });
 
+    // Store the last drag position to calculate delta
+    const lastDragPosRef = useRef({ x: 0, y: 0 });
     const lastMousePosRef = useRef({ x: 0, y: 0 });
 
     useEffect(() => {
@@ -81,10 +82,15 @@ export function useCanvasGestures({
 
             setStartPanPoint({ x: e.clientX, y: e.clientY });
         } else if (draggedNodeId && onNodeDrag) {
-            const dx = (e.clientX - dragStartPos.x) / canvas.viewport.zoom;
-            const dy = (e.clientY - dragStartPos.y) / canvas.viewport.zoom;
+            // Calculate delta movement since last mouse position
+            const dx = (e.clientX - lastDragPosRef.current.x) / canvas.viewport.zoom;
+            const dy = (e.clientY - lastDragPosRef.current.y) / canvas.viewport.zoom;
 
+            // Update the position based on delta
             onNodeDrag(draggedNodeId, { x: dx, y: dy });
+
+            // Update last drag position
+            lastDragPosRef.current = { x: e.clientX, y: e.clientY };
         }
     };
 
@@ -128,7 +134,7 @@ export function useCanvasGestures({
     const startNodeDrag = (nodeId: string, e: React.MouseEvent) => {
         e.stopPropagation();
         setDraggedNodeId(nodeId);
-        setDragStartPos({ x: e.clientX, y: e.clientY });
+        lastDragPosRef.current = { x: e.clientX, y: e.clientY };
 
         if (onNodeDragStart) {
             onNodeDragStart(nodeId, { x: e.clientX, y: e.clientY });
