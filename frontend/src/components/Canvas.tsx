@@ -1,4 +1,5 @@
 import { Stage, Layer, Arrow, Rect, Text, Group } from "react-konva";
+import { nanoid } from "nanoid";
 import { useDiagramStore } from "../store/diagramStore";
 import { Node } from "./Node";
 import { Edge } from "./Edge";
@@ -12,6 +13,7 @@ export const Canvas = () => {
   const updateConnecting = useDiagramStore((s) => s.updateConnecting);
   const finishConnecting = useDiagramStore((s) => s.finishConnecting);
   const collapse = useDiagramStore((s) => s.collapse);
+  const addNode = useDiagramStore((s) => s.addNode);
   // canvas dimensions and click-to-collapse margin (in px)
   const width = window.innerWidth;
   const height = window.innerHeight;
@@ -63,6 +65,27 @@ export const Canvas = () => {
              pos.y < BORDER_MARGIN || pos.y > height - BORDER_MARGIN)
           ) {
             collapse();
+          }
+        }
+      }}
+      onDblClick={(e) => {
+        if (connecting) return;
+        // only add node when double-clicking on empty canvas
+        if (e.target === e.currentTarget) {
+          const stage = e.target.getStage();
+          const pos = stage?.getPointerPosition();
+          if (pos) {
+            addNode({ id: nanoid(), x: pos.x, y: pos.y, label: "Node" });
+          }
+        }
+      }}
+      onDblTap={(e) => {
+        if (connecting) return;
+        if (e.target === e.currentTarget) {
+          const stage = e.target.getStage();
+          const pos = stage?.getPointerPosition();
+          if (pos) {
+            addNode({ id: nanoid(), x: pos.x, y: pos.y, label: "Node" });
           }
         }
       }}
