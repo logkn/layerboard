@@ -21,6 +21,12 @@ export type Connecting = {
   toY: number;
 };
 
+// Type for diagram data structure when exporting/importing
+export type DiagramData = {
+  nodes: Node[];
+  edges: Edge[];
+};
+
 interface DiagramState {
   /** Map of graphId to its nodes and edges */
   graphs: Record<string, { nodes: Node[]; edges: Edge[] }>;
@@ -64,9 +70,15 @@ interface DiagramState {
   zoomIn: () => void;
   /** Zoom out by a fixed multiplier */
   zoomOut: () => void;
+  /** Export current graph to JSON */
+  exportDiagram: () => DiagramData;
+  /** Import diagram from JSON data */
+  importDiagram: (data: DiagramData, graphId?: string) => void;
+  /** Clear all nodes and edges from the current graph */
+  clearGraph: () => void;
 }
 
-export const useDiagramStore = create<DiagramState>((set, _get) => ({
+export const useDiagramStore = create<DiagramState>((set, get) => ({
   // initialize root graph container
   graphs: { root: { nodes: [], edges: [] } },
   currentGraphId: "root",
@@ -265,4 +277,52 @@ export const useDiagramStore = create<DiagramState>((set, _get) => ({
   zoom: 1,
   zoomIn: () => set((state) => ({ zoom: state.zoom * 1.2 })),
   zoomOut: () => set((state) => ({ zoom: state.zoom / 1.2 })),
+
+  // Export the current graph to JSON
+  exportDiagram: () => {
+    const state = get();
+    const currentGraph = state.graphs[state.currentGraphId];
+    return {
+      nodes: [...currentGraph.nodes],
+      edges: [...currentGraph.edges],
+    };
+  },
+
+  // Import diagram data into the current graph or specified graph
+  importDiagram: (data, graphId) => {
+    set((state) => {
+      const targetGraphId = graphId || state.currentGraphId;
+      // Create the graph if it doesn't exist
+      if (!state.graphs[targetGraphId]) {
+        state.graphs[targetGraphId] = { nodes: [], edges: [] };
+      }
+
+      return {
+        graphs: {
+          ...state.graphs,
+          [targetGraphId]: {
+            nodes: data.nodes,
+            edges: data.edges,
+          },
+        },
+        // Switch to the imported graph if specified
+        ...(graphId ? { currentGraphId: graphId } : {}),
+      };
+    });
+  },
+
+  // Clear all nodes and edges from the current graph
+  clearGraph: () => {
+    set((state) => {
+      const cg = state.currentGraphId;
+      return {
+        graphs: {
+          ...state.graphs,
+          [cg]: { nodes: [], edges: [] },
+        },
+        selectedNodeIds: [],
+        selectedEdgeId: null,
+      };
+    });
+  },
 }));

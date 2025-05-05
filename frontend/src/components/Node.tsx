@@ -408,13 +408,7 @@ export const Node = ({ id, x, y, label }: Props) => {
             stroke="gray"
             cornerRadius={4}
           />
-          <Text
-            text={label}
-            fontSize={14}
-            fill="black"
-            x={4}
-            y={4}
-          />
+          <Text text={label} fontSize={14} fill="black" x={4} y={4} />
         </Group>
       )}
       {/* custom context menu rendered inside Konva when open */}
