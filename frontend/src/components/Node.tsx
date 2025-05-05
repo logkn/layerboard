@@ -1,5 +1,5 @@
 import { Circle, Text, Group, Rect } from "react-konva";
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useDiagramStore } from "../store/diagramStore";
 
 type Props = {
@@ -13,8 +13,12 @@ export const Node = ({ id, x, y, label }: Props) => {
   const update = useDiagramStore((s) => s.updateNodePosition);
   const updateLabel = useDiagramStore((s) => s.updateNodeLabel);
   const startConnecting = useDiagramStore((s) => s.startConnecting);
+  const expandNode = useDiagramStore((s) => s.expandNode);
   const [hovered, setHovered] = useState(false);
   const [isDragging, setIsDragging] = useState(false);
+  // context menu state: open flag and position in stage coordinates
+  const [contextMenuOpen, setContextMenuOpen] = useState(false);
+  const [menuPos, setMenuPos] = useState<{ x: number; y: number }>({ x: 0, y: 0 });
   // increased node dimensions for better visibility
   const width = 160;
   const height = 80;
@@ -25,9 +29,9 @@ export const Node = ({ id, x, y, label }: Props) => {
   // handle double-click to edit the node label inline
   const handleTextDblClick = (e: any) => {
     e.cancelBubble = true;
-    const stage = e.target.getStage();
-    const layer = e.target.getLayer();
-    const textNode = textRef.current;
+    const stage = e.target.getStage()!;
+    const layer = e.target.getLayer()!;
+    const textNode = textRef.current!;
     // hide the Konva text and redraw layer
     textNode.hide();
     layer.draw();
@@ -87,6 +91,62 @@ export const Node = ({ id, x, y, label }: Props) => {
       }
     });
   };
+  /**
+   * Right-click handler to open custom context menu on this node
+   */
+  const handleContextMenu = (e: any) => {
+    // prevent browser context menu
+    if (e.evt && e.evt.preventDefault) {
+      e.evt.preventDefault();
+    }
+    // stop Konva event bubbling
+    e.cancelBubble = true;
+    // get click position in stage coordinates
+    const stage = e.target.getStage()!;
+    const pos = stage.getPointerPosition();
+    if (pos) {
+      setMenuPos({ x: pos.x, y: pos.y });
+      setContextMenuOpen(true);
+    }
+  };
+  const closeContextMenu = () => setContextMenuOpen(false);
+  // menu actions
+  const handleEditTextMenu = () => {
+    closeContextMenu();
+    // trigger inline edit on the label text
+    const fakeEvt: any = { target: textRef.current!, cancelBubble: false };
+    handleTextDblClick(fakeEvt);
+  };
+  const handleDummyMenu = () => {
+    closeContextMenu();
+    // no-op
+  };
+  /** Expand this node into its subgraph */
+  const handleExpandMenu = () => {
+    closeContextMenu();
+    expandNode(id);
+  };
+  // hover state for context menu items
+  const [hoveredMenuItem, setHoveredMenuItem] = useState<number | null>(null);
+  /**
+   * Close the context menu when clicking anywhere outside this node (background, other shapes, etc.)
+   */
+  useEffect(() => {
+    if (!contextMenuOpen) return;
+    // get the Konva Stage instance from any node (textRef)
+    const stage = textRef.current?.getStage();
+    if (!stage) return;
+    // handler to close menu on stage click
+    const handleStageClick = (e: any) => {
+      closeContextMenu();
+    };
+    // listen for click events on the stage
+    stage.on('click', handleStageClick);
+    // cleanup when menu is closed or component unmounts
+    return () => {
+      stage.off('click', handleStageClick);
+    };
+  }, [contextMenuOpen, closeContextMenu]);
 
   return (
     <Group
@@ -94,29 +154,37 @@ export const Node = ({ id, x, y, label }: Props) => {
       x={x}
       y={y}
       draggable
+      onContextMenu={handleContextMenu}
+      onClick={(e) => {
+        // close context menu on left-click
+        if (contextMenuOpen) {
+          e.cancelBubble = true;
+          closeContextMenu();
+        }
+      }}
       scaleX={isDragging ? 1.05 : 1}
       scaleY={isDragging ? 1.05 : 1}
       onMouseEnter={(e) => {
         setHovered(true);
-        const container = e.target.getStage().container();
+        const container = e.target.getStage()!.container();
         container.style.cursor = "grab";
       }}
       onMouseLeave={(e) => {
         setHovered(false);
-        const container = e.target.getStage().container();
+        const container = e.target.getStage()!.container();
         container.style.cursor = "default";
       }}
       onMouseDown={(e) => {
-        const container = e.target.getStage().container();
+        const container = e.target.getStage()!.container();
         container.style.cursor = "grabbing";
       }}
       onMouseUp={(e) => {
-        const container = e.target.getStage().container();
+        const container = e.target.getStage()!.container();
         container.style.cursor = "grab";
       }}
       onDragStart={(e) => {
         setIsDragging(true);
-        const container = e.target.getStage().container();
+        const container = e.target.getStage()!.container();
         container.style.cursor = "grabbing";
       }}
       onDragMove={(e) => {
@@ -125,7 +193,7 @@ export const Node = ({ id, x, y, label }: Props) => {
       onDragEnd={(e) => {
         setIsDragging(false);
         update(id, e.target.x(), e.target.y());
-        const container = e.target.getStage().container();
+        const container = e.target.getStage()!.container();
         container.style.cursor = "grab";
       }}
     >
@@ -177,16 +245,16 @@ export const Node = ({ id, x, y, label }: Props) => {
             x={0}
             y={-height / 2}
             onMouseEnter={(e) => {
-              const container = e.target.getStage().container();
+              const container = e.target.getStage()!.container();
               container.style.cursor = "crosshair";
             }}
             onMouseLeave={(e) => {
-              const container = e.target.getStage().container();
+              const container = e.target.getStage()!.container();
               container.style.cursor = "grab";
             }}
             onMouseDown={(e) => {
               e.cancelBubble = true;
-              const stage = e.target.getStage();
+              const stage = e.target.getStage()!;
               const pos = stage.getPointerPosition()!;
               startConnecting(id, pos.x, pos.y);
             }}
@@ -198,16 +266,16 @@ export const Node = ({ id, x, y, label }: Props) => {
             x={width / 2}
             y={0}
             onMouseEnter={(e) => {
-              const container = e.target.getStage().container();
+              const container = e.target.getStage()!.container();
               container.style.cursor = "crosshair";
             }}
             onMouseLeave={(e) => {
-              const container = e.target.getStage().container();
+              const container = e.target.getStage()!.container();
               container.style.cursor = "grab";
             }}
             onMouseDown={(e) => {
               e.cancelBubble = true;
-              const stage = e.target.getStage();
+              const stage = e.target.getStage()!;
               const pos = stage.getPointerPosition()!;
               startConnecting(id, pos.x, pos.y);
             }}
@@ -219,16 +287,16 @@ export const Node = ({ id, x, y, label }: Props) => {
             x={0}
             y={height / 2}
             onMouseEnter={(e) => {
-              const container = e.target.getStage().container();
+              const container = e.target.getStage()!.container();
               container.style.cursor = "crosshair";
             }}
             onMouseLeave={(e) => {
-              const container = e.target.getStage().container();
+              const container = e.target.getStage()!.container();
               container.style.cursor = "grab";
             }}
             onMouseDown={(e) => {
               e.cancelBubble = true;
-              const stage = e.target.getStage();
+              const stage = e.target.getStage()!;
               const pos = stage.getPointerPosition()!;
               startConnecting(id, pos.x, pos.y);
             }}
@@ -240,16 +308,16 @@ export const Node = ({ id, x, y, label }: Props) => {
             x={-width / 2}
             y={0}
             onMouseEnter={(e) => {
-              const container = e.target.getStage().container();
+              const container = e.target.getStage()!.container();
               container.style.cursor = "crosshair";
             }}
             onMouseLeave={(e) => {
-              const container = e.target.getStage().container();
+              const container = e.target.getStage()!.container();
               container.style.cursor = "grab";
             }}
             onMouseDown={(e) => {
               e.cancelBubble = true;
-              const stage = e.target.getStage();
+              const stage = e.target.getStage()!;
               const pos = stage.getPointerPosition()!;
               startConnecting(id, pos.x, pos.y);
             }}
@@ -257,6 +325,57 @@ export const Node = ({ id, x, y, label }: Props) => {
             <Circle radius={6} fill="white" stroke="black" strokeWidth={1} />
           </Group>
         </>
+      )}
+      {/* custom context menu rendered inside Konva when open */}
+      {contextMenuOpen && (
+        <Group x={menuPos.x - x} y={menuPos.y - y}>
+          {/* menu background */}
+          <Rect
+            width={120}
+            height={72}
+            fill="white"
+            stroke="gray"
+            cornerRadius={4}
+            shadowColor="black"
+            shadowBlur={4}
+            shadowOffset={{ x: 2, y: 2 }}
+            shadowOpacity={0.3}
+          />
+          {[
+            { label: 'Edit Text', onClick: handleEditTextMenu },
+            { label: 'Expand', onClick: handleExpandMenu },
+            { label: 'Dummy', onClick: handleDummyMenu },
+          ].map((item, i) => (
+            <Group
+              key={i}
+              y={i * 24}
+              onMouseEnter={(e) => {
+                setHoveredMenuItem(i);
+              }}
+              onMouseLeave={() => {
+                setHoveredMenuItem(null);
+              }}
+              onClick={(e) => {
+                e.cancelBubble = true;
+                item.onClick();
+              }}
+            >
+              <Rect
+                width={120}
+                height={24}
+                fill={hoveredMenuItem === i ? '#e8e8e8' : 'white'}
+              />
+              <Text
+                text={item.label}
+                fontSize={14}
+                fill="black"
+                padding={4}
+                width={120}
+                height={24}
+              />
+            </Group>
+          ))}
+        </Group>
       )}
     </Group>
   );
