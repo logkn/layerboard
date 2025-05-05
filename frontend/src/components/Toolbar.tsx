@@ -15,8 +15,24 @@ export const Toolbar: React.FC = () => {
     addNode({ id: nanoid(), x: 100, y: 100, label: "Node" });
   };
 
+  // Start edge creation from the selected node (from its center)
+  const selectedNodeIds = useDiagramStore((s) => s.selectedNodeIds);
+  const currentGraphId = useDiagramStore((s) => s.currentGraphId);
+  const graphNodes = useDiagramStore((s) => s.graphs[currentGraphId].nodes);
+  const startConnecting = useDiagramStore((s) => s.startConnecting);
   const handleAddEdge = () => {
-    console.log("Add Edge mode not implemented");
+    if (selectedNodeIds.length !== 1) {
+      console.warn("Add Edge: please select exactly one node to start from.");
+      return;
+    }
+    const fromId = selectedNodeIds[0];
+    const node = graphNodes.find((n) => n.id === fromId);
+    if (!node) {
+      console.warn(`Add Edge: selected node '${fromId}' not found.`);
+      return;
+    }
+    // initiate connecting from the center of the node
+    startConnecting(fromId, node.x, node.y);
   };
 
   const zoomIn = useDiagramStore((s) => s.zoomIn);
@@ -29,8 +45,10 @@ export const Toolbar: React.FC = () => {
     zoomOut();
   };
 
+  // Reset zoom to default (fit-to-screen)
   const handleFit = () => {
-    console.log("Fit to Screen not implemented");
+    // reset zoom scale to 1
+    useDiagramStore.setState({ zoom: 1 });
   };
 
   return (
