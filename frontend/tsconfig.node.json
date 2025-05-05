@@ -10,10 +10,11 @@
         "skipLibCheck": true,
         /* Bundler mode */
         "moduleResolution": "bundler",
-        "allowImportingTsExtensions": true,
+        "resolveJsonModule": true,
         "isolatedModules": true,
         "moduleDetection": "force",
-        "noEmit": false,
+        "declaration": true,
+        "emitDeclarationOnly": true, // Allow importing TS extensions and emit declarations
         /* Linting */
         "strict": true,
         "noUnusedLocals": true,
@@ -22,6 +23,6 @@
         "noUncheckedSideEffectImports": true
     },
     "include": [
-        "..."
+        "vite.config.ts"
     ]
 }

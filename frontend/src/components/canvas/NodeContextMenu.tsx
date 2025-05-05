@@ -1,7 +1,6 @@
 import React, { useEffect, useRef } from 'react';
 import { Node as NodeType } from '../../types/Node';
 import { useNodeStore } from '../../store/nodeStore';
-import { useEdgeStore } from '../../store/edgeStore';
 
 interface NodeContextMenuProps {
     node: NodeType;

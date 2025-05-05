@@ -6,7 +6,7 @@ import { useCanvasStore } from './store/canvasStore';
 import { useNodeStore } from './store/nodeStore';
 
 const App: React.FC = () => {
-    const { canvases, currentCanvasId, createCanvas } = useCanvasStore();
+    const { canvases, currentCanvasId } = useCanvasStore();
     const { createNode } = useNodeStore();
 
     // Initialize with some sample data on first load
@@ -14,7 +14,7 @@ const App: React.FC = () => {
         // Only initialize if we have an empty root canvas
         if (canvases['root'] && canvases['root'].nodes.length === 0) {
             // Create some initial nodes
-            const node1Id = createNode('root', {
+            createNode('root', {
                 label: 'System',
                 position: { x: 200, y: 200 },
                 size: { width: 150, height: 80 },
@@ -22,7 +22,7 @@ const App: React.FC = () => {
                 parentId: null
             });
 
-            const node2Id = createNode('root', {
+            createNode('root', {
                 label: 'Database',
                 position: { x: 500, y: 200 },
                 size: { width: 150, height: 80 },
@@ -30,7 +30,7 @@ const App: React.FC = () => {
                 parentId: null
             });
 
-            const node3Id = createNode('root', {
+            createNode('root', {
                 label: 'API',
                 position: { x: 200, y: 400 },
                 size: { width: 150, height: 80 },

@@ -1,7 +1,7 @@
 import React from 'react';
 
 // SVG icon components
-export const NodeIcon = (props: React.SVGProps<SVGSVGElement>): JSX.Element => (
+export const NodeIcon = (props: React.SVGProps<SVGSVGElement>): React.ReactElement => (
     <svg
         width="24"
         height="24"
@@ -17,7 +17,7 @@ export const NodeIcon = (props: React.SVGProps<SVGSVGElement>): JSX.Element => (
     </svg>
 );
 
-export const EdgeIcon = (props: React.SVGProps<SVGSVGElement>): JSX.Element => (
+export const EdgeIcon = (props: React.SVGProps<SVGSVGElement>): React.ReactElement => (
     <svg
         width="24"
         height="24"
@@ -34,7 +34,7 @@ export const EdgeIcon = (props: React.SVGProps<SVGSVGElement>): JSX.Element => (
     </svg>
 );
 
-export const ExpandIcon = (props: React.SVGProps<SVGSVGElement>): JSX.Element => (
+export const ExpandIcon = (props: React.SVGProps<SVGSVGElement>): React.ReactElement => (
     <svg
         width="24"
         height="24"
@@ -53,7 +53,7 @@ export const ExpandIcon = (props: React.SVGProps<SVGSVGElement>): JSX.Element =>
     </svg>
 );
 
-export const CollapseIcon = (props: React.SVGProps<SVGSVGElement>): JSX.Element => (
+export const CollapseIcon = (props: React.SVGProps<SVGSVGElement>): React.ReactElement => (
     <svg
         width="24"
         height="24"
@@ -72,7 +72,7 @@ export const CollapseIcon = (props: React.SVGProps<SVGSVGElement>): JSX.Element 
     </svg>
 );
 
-export const ZoomInIcon = (props: React.SVGProps<SVGSVGElement>): JSX.Element => (
+export const ZoomInIcon = (props: React.SVGProps<SVGSVGElement>): React.ReactElement => (
     <svg
         width="24"
         height="24"
@@ -91,7 +91,7 @@ export const ZoomInIcon = (props: React.SVGProps<SVGSVGElement>): JSX.Element =>
     </svg>
 );
 
-export const ZoomOutIcon = (props: React.SVGProps<SVGSVGElement>): JSX.Element => (
+export const ZoomOutIcon = (props: React.SVGProps<SVGSVGElement>): React.ReactElement => (
     <svg
         width="24"
         height="24"
@@ -109,7 +109,7 @@ export const ZoomOutIcon = (props: React.SVGProps<SVGSVGElement>): JSX.Element =
     </svg>
 );
 
-export const ResetIcon = (props: React.SVGProps<SVGSVGElement>): JSX.Element => (
+export const ResetIcon = (props: React.SVGProps<SVGSVGElement>): React.ReactElement => (
     <svg
         width="24"
         height="24"
@@ -126,7 +126,7 @@ export const ResetIcon = (props: React.SVGProps<SVGSVGElement>): JSX.Element => 
     </svg>
 );
 
-export const TrashIcon = (props: React.SVGProps<SVGSVGElement>): JSX.Element => (
+export const TrashIcon = (props: React.SVGProps<SVGSVGElement>): React.ReactElement => (
     <svg
         width="24"
         height="24"
@@ -144,7 +144,7 @@ export const TrashIcon = (props: React.SVGProps<SVGSVGElement>): JSX.Element => 
     </svg>
 );
 
-export const EditIcon = (props: React.SVGProps<SVGSVGElement>): JSX.Element => (
+export const EditIcon = (props: React.SVGProps<SVGSVGElement>): React.ReactElement => (
     <svg
         width="24"
         height="24"
@@ -161,7 +161,7 @@ export const EditIcon = (props: React.SVGProps<SVGSVGElement>): JSX.Element => (
     </svg>
 );
 
-export const ColorIcon = (props: React.SVGProps<SVGSVGElement>): JSX.Element => (
+export const ColorIcon = (props: React.SVGProps<SVGSVGElement>): React.ReactElement => (
     <svg
         width="24"
         height="24"
@@ -179,7 +179,7 @@ export const ColorIcon = (props: React.SVGProps<SVGSVGElement>): JSX.Element => 
     </svg>
 );
 
-export const ArrowUpIcon = (props: React.SVGProps<SVGSVGElement>): JSX.Element => (
+export const ArrowUpIcon = (props: React.SVGProps<SVGSVGElement>): React.ReactElement => (
     <svg
         width="24"
         height="24"

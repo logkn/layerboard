@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import { useCanvasStore } from '../../store/canvasStore';
 import { useNodeStore } from '../../store/nodeStore';
 import { useEdgeStore } from '../../store/edgeStore';
@@ -15,7 +15,7 @@ interface CanvasProps {
 const Canvas: React.FC<CanvasProps> = ({ canvasId }) => {
     const { canvases } = useCanvasStore();
     const { nodes, moveNode } = useNodeStore();
-    const { edges, pendingEdge, finishEdgeCreation, cancelEdgeCreation } = useEdgeStore();
+    const { edges, pendingEdge, cancelEdgeCreation } = useEdgeStore();
     const [mousePosition, setMousePosition] = useState<NodePosition>({ x: 0, y: 0 });
 
     const canvas = canvases[canvasId];
@@ -36,7 +36,6 @@ const Canvas: React.FC<CanvasProps> = ({ canvasId }) => {
 
     const {
         isPanning,
-        draggedNodeId,
         handleCanvasMouseDown,
         handleCanvasMouseMove,
         handleCanvasMouseUp,
@@ -47,7 +46,7 @@ const Canvas: React.FC<CanvasProps> = ({ canvasId }) => {
         onNodeDrag: handleNodeDrag
     });
 
-    const handleCanvasClick = (e: React.MouseEvent) => {
+    const handleCanvasClick = () => {
         // If we're in edge creation mode, cancel it on canvas click
         if (pendingEdge.pending) {
             cancelEdgeCreation();

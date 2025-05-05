@@ -20,8 +20,9 @@ body {
   padding: 0;
   min-width: 320px;
   min-height: 100vh;
-  background-color: theme('colors.background');
-  color: theme('colors.text');
+  /* Replace theme function with direct color values */
+  background-color: #0C0E12; /* Same as theme('colors.background') */
+  color: #E2E4E9; /* Same as theme('colors.text') */
 }
 
 #root {

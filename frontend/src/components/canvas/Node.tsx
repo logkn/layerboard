@@ -10,14 +10,13 @@ interface NodeProps {
     onPortClick: () => void;
 }
 
-const Node: React.FC<NodeProps> = ({ node, onDragStart, onNodeExpand, onPortClick }) => {
+const Node: React.FC<NodeProps> = ({ node, onDragStart, onNodeExpand }) => {
     const { pendingEdge, startEdgeCreation, finishEdgeCreation } = useEdgeStore();
     const [contextMenuOpen, setContextMenuOpen] = useState(false);
     const [contextMenuPosition, setContextMenuPosition] = useState({ x: 0, y: 0 });
 
     // Node default styles
     const defaultColor = '#6E56CF';
-    const defaultBorderStyle = '2px solid #6E56CF';
 
     const handleDoubleClick = (e: React.MouseEvent) => {
         e.stopPropagation();
