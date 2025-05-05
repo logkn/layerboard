@@ -3,7 +3,7 @@ import { nanoid } from "nanoid";
 import { useDiagramStore } from "../store/diagramStore";
 import { Node } from "./Node";
 import { Edge } from "./Edge";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 export const Canvas = () => {
   const currentGraphId = useDiagramStore((s) => s.currentGraphId);
@@ -14,6 +14,14 @@ export const Canvas = () => {
   const updateConnecting = useDiagramStore((s) => s.updateConnecting);
   const finishConnecting = useDiagramStore((s) => s.finishConnecting);
   const collapse = useDiagramStore((s) => s.collapse);
+  // keyboard shortcut: Esc or Backspace to drill up (collapse to parent graph)
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape" || e.key === "Backspace") collapse();
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [collapse]);
   const addNode = useDiagramStore((s) => s.addNode);
   // action to deselect selected edge when clicking on canvas background
   const setSelectedEdge = useDiagramStore((s) => s.setSelectedEdge);
