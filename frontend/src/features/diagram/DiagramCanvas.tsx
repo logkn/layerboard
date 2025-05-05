@@ -4,6 +4,7 @@ import { Canvas } from "../../components/Canvas";
 
 export const DiagramCanvas = () => {
   const addNode = useDiagramStore((s) => s.addNode);
+  const collapse = useDiagramStore((s) => s.collapse);
   // breadcrumb / context bar: show current graph path
   const currentGraphId = useDiagramStore((s) => s.currentGraphId);
   const rootNodes = useDiagramStore((s) => s.graphs["root"].nodes);
@@ -15,7 +16,7 @@ export const DiagramCanvas = () => {
 
   return (
     <>
-      {/* Context bar / breadcrumb showing current graph */}
+      {/* Context bar / breadcrumb showing current graph and Back button */}
       <div
         style={{
           position: "absolute",
@@ -26,9 +27,21 @@ export const DiagramCanvas = () => {
           padding: "4px 8px",
           borderRadius: "4px",
           fontSize: "14px",
+          display: "flex",
+          alignItems: "center",
         }}
       >
-        {breadcrumbLabel}
+        {currentGraphId !== "root" && (
+          <button
+            onClick={collapse}
+            style={{
+              marginRight: 8,
+            }}
+          >
+            Back
+          </button>
+        )}
+        <span>{breadcrumbLabel}</span>
       </div>
       <button
         onClick={() => addNode({ id: nanoid(), x: 100, y: 100, label: "Node" })}
