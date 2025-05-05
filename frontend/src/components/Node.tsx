@@ -394,6 +394,29 @@ export const Node = ({ id, x, y, label }: Props) => {
           </Group>
         </>
       )}
+      {/* tooltip on hover: display node label above node */}
+      {hovered && (
+        <Group
+          // position tooltip above the node
+          x={-(label.length * 7 + 8) / 2}
+          y={-height / 2 - (14 + 8)}
+        >
+          <Rect
+            width={label.length * 7 + 8}
+            height={14 + 8}
+            fill="white"
+            stroke="gray"
+            cornerRadius={4}
+          />
+          <Text
+            text={label}
+            fontSize={14}
+            fill="black"
+            x={4}
+            y={4}
+          />
+        </Group>
+      )}
       {/* custom context menu rendered inside Konva when open */}
       {contextMenuOpen && (
         <Group x={menuPos.x - x} y={menuPos.y - y}>

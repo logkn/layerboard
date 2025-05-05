@@ -232,6 +232,25 @@ export const Edge = ({ id, from, to, label }: Props) => {
         onDblClick={handleTextDblClick}
         onDblTap={handleTextDblClick}
       />
+      {/* tooltip on hover: display edge label near midpoint */}
+      {hovered && label && (
+        <Group x={midX + 10} y={midY + 10}>
+          <Rect
+            width={label.length * 7 + 8}
+            height={14 + 8}
+            fill="white"
+            stroke="gray"
+            cornerRadius={4}
+          />
+          <Text
+            text={label}
+            fontSize={14}
+            fill="black"
+            x={4}
+            y={4}
+          />
+        </Group>
+      )}
       {/* context menu */}
       {contextMenuOpen && (
         <Group x={menuPos.x} y={menuPos.y}>
