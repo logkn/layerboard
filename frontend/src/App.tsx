@@ -1,10 +1,14 @@
 import "./App.css";
 import { DiagramCanvas } from "./features/diagram/DiagramCanvas";
+import { PropertiesPanel } from "./components/PropertiesPanel";
 
 function App() {
   return (
-    <div>
-      <DiagramCanvas />
+    <div style={{ display: "flex", height: "100vh" }}>
+      <div style={{ flex: 1, position: "relative" }}>
+        <DiagramCanvas />
+      </div>
+      <PropertiesPanel />
     </div>
   );
 }

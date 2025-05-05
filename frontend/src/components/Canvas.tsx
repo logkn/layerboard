@@ -36,8 +36,10 @@ export const Canvas = () => {
   const [bgHoveredMenuItem, setBgHoveredMenuItem] = useState<number | null>(
     null,
   );
-  // canvas dimensions and click-to-collapse margin (in px)
-  const width = window.innerWidth;
+  // dimensions accounting for properties panel on the right (in px)
+  const PANEL_WIDTH = 300;
+  // canvas width excludes the right-sidebar panel
+  const width = window.innerWidth - PANEL_WIDTH;
   const height = window.innerHeight;
   const BORDER_MARGIN = 50;
 
